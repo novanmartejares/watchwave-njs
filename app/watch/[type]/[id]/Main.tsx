@@ -33,10 +33,9 @@ import useSetTracker from '@/app/firebase/useSetTracker';
 import { doc } from 'firebase/firestore';
 import { db } from '@/app/firebase/firebase';
 import { useDocumentData } from 'react-firebase-hooks/firestore';
-import { useParams } from 'next/navigation';
 
-const Main = () => {
-	const { id, type } = useParams();
+const Main = ({ params }: { params: { type: string; id: number } }) => {
+	const { id, type } = params;
 	const [result, setResult] = useState<MovieDetails | ShowDetails | null>(null);
 	const [season, setSeason] = useState(0);
 	const [episode, setEpisode] = useState(1);
@@ -53,13 +52,18 @@ const Main = () => {
 		`https://anyembed.xyz/movie/${id}`,
 		`https://2embed.org/e.php?id=${id}`,
 	];
-	const sourceCollectionTV = [
-		`https://vidsrc.to/embed/tv/${id}/${season}/${episode}`,
-		`https://multiembed.mov/directstream.php?video_id=${id}&tmdb=1&s=${season}&e=${episode}`,
-		`https://anyembed.xyz/tv/${id}/${season}/${episode}`,
-		`https://2embed.org/series.php?id=${id}/${season}/${episode}`,
-		`https://vidsrc.me/embed/tv?tmdb=${id}&season=${season}&episode=${episode}&color=006FEE`,
-	];
+	const sourceCollectionTV = result &&
+		'name' in result && [
+			`https://vidsrc.to/embed/tv/${id}/${result?.seasons[0]?.name === 'Specials' ? season : season + 1}/${episode}`,
+			`https://multiembed.mov/directstream.php?video_id=${id}&tmdb=1&s=${
+				result?.seasons[0]?.name === 'Specials' ? season : season + 1
+			}&e=${episode}`,
+			`https://anyembed.xyz/tv/${id}/${result?.seasons[0]?.name === 'Specials' ? season : season + 1}/${episode}`,
+			`https://2embed.org/series.php?id=${id}/${result?.seasons[0]?.name === 'Specials' ? season : season + 1}/${episode}`,
+			`https://vidsrc.me/embed/tv?tmdb=${id}&season=${
+				result?.seasons[0]?.name === 'Specials' ? season : season + 1
+			}&episode=${episode}&color=006FEE`,
+		];
 
 	const [value, loading, error] = useDocumentData(doc(db, 'users/' + user?.uid));
 
@@ -392,11 +396,15 @@ const Main = () => {
 									</motion.div>
 								)}
 								<div className="fc z-10 aspect-video w-full bg-background sm:rounded-2xl">
-									<iframe
-										allowFullScreen={true}
-										className="z-10 aspect-video w-full sm:rounded-2xl"
-										src={sourceCollectionTV[source]}
-									/>
+									{sourceCollectionTV ? (
+										<iframe
+											allowFullScreen={true}
+											className="z-10 aspect-video w-full sm:rounded-2xl"
+											src={sourceCollectionTV[source]}
+										/>
+									) : (
+										<div className="z-10 aspect-video w-full sm:rounded-2xl">Loading</div>
+									)}
 									<div className="fr w-full flex-wrap gap-3 pt-2 sm:justify-between">
 										<Dropdown>
 											<DropdownTrigger>
@@ -415,13 +423,18 @@ const Main = () => {
 															key={index}
 															onClick={() => {
 																setSeason(index);
+
 																// set episode to first index of the selected season
 																setEpisode(result.seasons[index].episodes[0].episode_number);
 																set(index, result.seasons[index].episodes[0].episode_number, id);
 															}}
 														>
 															{season.name} •{' '}
-															{season.episodes.length > 1 ? <>{season.episodes.length} episodes</> : <>1 episode</>}
+															{!(season.episodes.length === 1) ? (
+																<>{season.episodes.length} episodes</>
+															) : (
+																<>1 episode</>
+															)}
 														</DropdownItem>
 													))}
 											</DropdownMenu>
@@ -456,9 +469,13 @@ const Main = () => {
 													</Button>
 												</DropdownTrigger>
 												<DropdownMenu aria-label="Source Selection" onAction={(key) => setSource(Number(key))}>
-													{sourceCollectionTV.map((source, index) => (
-														<DropdownItem key={index}>Source {index + 1}</DropdownItem>
-													))}
+													{sourceCollectionTV ? (
+														sourceCollectionTV.map((source, index) => (
+															<DropdownItem key={index}>Source {index + 1}</DropdownItem>
+														))
+													) : (
+														<DropdownItem>Sources not available</DropdownItem>
+													)}
 												</DropdownMenu>
 											</Dropdown>
 										</div>

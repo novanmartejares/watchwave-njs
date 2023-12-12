@@ -47,6 +47,6 @@ export async function generateMetadata({ params }: Props, parent: ResolvingMetad
 	};
 }
 
-export default function Page() {
-	return <Main />;
+export default function Page({ params }: Props) {
+	return <Main params={params} />;
 }
