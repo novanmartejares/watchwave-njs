@@ -43,7 +43,8 @@ export default function RootLayout({ children }: { children: React.ReactNode }) 
 				<AppContainer>
 					<Navbar />
 					<BottomNavbar />
-					{children} <Analytics />
+					{children}
+					<Analytics />
 				</AppContainer>
 			</body>
 		</html>
