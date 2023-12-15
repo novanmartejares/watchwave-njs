@@ -12,8 +12,8 @@ import CommentSlider from './CommentSlider';
 import { db } from '@/app/firebase/firebase';
 import { doc } from 'firebase/firestore';
 import { UserAuth } from '@/app/context/AuthContext';
-import useComment from '@/app/firebase/useComment';
 import { useDocumentData } from 'react-firebase-hooks/firestore';
+import Error from '@/app/error';
 
 async function fetchDetails(id: number, type: string) {
 	// console.log(id, type);
@@ -65,7 +65,7 @@ async function fetchDetails(id: number, type: string) {
 
 interface Props {
 	result: MovieDetails | ShowDetails | null;
-	setLoading: React.Dispatch<React.SetStateAction<boolean>>;
+	setIsLoading: (isLoading: boolean) => void;
 }
 interface DetailsData {
 	recommendations: { results: recommendationProps[] };
@@ -76,23 +76,37 @@ interface DetailsData {
 	external: any;
 }
 
-const Details = ({ result, setLoading }: Props) => {
+const Details = ({ result, setIsLoading }: Props) => {
+	console.log(setIsLoading);
 	const [detailsData, setDetailsData] = useState<DetailsData | null>(null);
 	const { user } = UserAuth();
 	const [value, loading, error] = useDocumentData(doc(db, 'commentsCollection/' + result?.media_type));
-	const { send } = useComment();
+
 	useEffect(() => {
 		console.log(value);
 	}, [value]);
 	useEffect(() => {
+		setIsLoading(true);
+	}, [loading]);
+
+	useEffect(() => {
 		if (result?.id) {
-			setLoading(true);
+			setIsLoading(true);
 			fetchDetails(result.id, result.media_type).then((data) => {
 				setDetailsData(data);
-				setLoading(false);
+				setIsLoading(false);
 			});
 		}
 	}, [result]);
+
+	if (error)
+		<Error
+			error={error}
+			reset={() => {
+				window.location.reload();
+			}}
+		/>;
+
 	const { recommendations, credits, keywords, videos, reviews, external } = detailsData || {}; // Add default empty object to handle null case
 
 	if (!result?.id) return null;

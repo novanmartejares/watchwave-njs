@@ -238,6 +238,10 @@ const Main = ({ params }: { params: { type: string; id: number } }) => {
 		}
 	};
 
+	const setLoading = (state: boolean) => {
+		setIsLoading(state);
+	};
+
 	return (
 		<>
 			<div className="min-h-screen w-full overflow-hidden bg-background text-foreground dark">
@@ -374,7 +378,7 @@ const Main = ({ params }: { params: { type: string; id: number } }) => {
 								</div>
 								<div className="relative w-full"></div>
 							</div>
-							<Details result={result} setLoading={setIsLoading} />
+							<Details result={result} setIsLoading={setLoading} />
 						</>
 					) : type === 'tv' && result && 'seasons' in result ? (
 						<>
@@ -490,7 +494,7 @@ const Main = ({ params }: { params: { type: string; id: number } }) => {
 									/>
 								</div>
 							</div>
-							<Details result={result} />
+							<Details result={result} setIsLoading={setLoading} />
 						</>
 					) : null}
 				</div>

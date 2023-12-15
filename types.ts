@@ -336,6 +336,7 @@ export interface castProps {
 	imdb_id: string;
 	adult: boolean;
 	gender: 1 | 2;
+	character: string;
 	id: number;
 	known_for_department: string;
 	name: string;
