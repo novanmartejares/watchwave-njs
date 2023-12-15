@@ -1,7 +1,7 @@
 'use client';
 import options from '@/lib/options';
-import { Comments, MovieDetails, ShowDetails, castProps, genresProps, keywordProps, recommendationProps, reviewProps, videoProps } from '@/types';
-import { Button, Chip, Tooltip } from '@nextui-org/react';
+import { MovieDetails, ShowDetails, castProps, genresProps, keywordProps, recommendationProps, reviewProps, videoProps } from '@/types';
+import { Chip, Tooltip } from '@nextui-org/react';
 import Image from 'next/image';
 import Link from 'next/link';
 import React, { useState, useEffect } from 'react';
@@ -25,17 +25,22 @@ async function fetchDetails(id: number, type: string) {
 	} = await reccomendations.json();
 	// console.log(recc);
 
-	const credits = await fetch(`https://api.themoviedb.org/3/${type}/${id}/credits?language=en-US`, options)
-		.then((res) => res.json())
-		.then(async (data) => {
-			await data.cast.forEach(async (cast: castProps) => {
-				await fetch(`https://api.themoviedb.org/3/person/${cast.id}/external_ids`, options)
-					.then((res) => res.json())
-					.then((ext) => {
-						cast.imdb_id = ext.imdb_id;
-					});
-			});
-		});
+	const credits = await fetch(`https://api.themoviedb.org/3/${type}/${id}/credits?language=en-US`, options);
+	let cred = await credits.json();
+	// for each cast inside cred.cast,
+	//  fetch(
+	//   `https://api.themoviedb.org/3/person/${cast.id}/external_ids`,
+	//   options,
+	// )
+	// and then add it to the cast object as imdb_id in cred
+
+	await cred.cast.forEach(async (cast: castProps) => {
+		const external = await fetch(`https://api.themoviedb.org/3/person/${cast.id}/external_ids`, options);
+		let ext = await external.json();
+		cast.imdb_id = ext.imdb_id;
+	});
+
+	console.log(credits);
 
 	const keywords = await fetch(`https://api.themoviedb.org/3/${type}/${id}/keywords?language=en-US`, options);
 	let keyw = await keywords.json();
@@ -50,7 +55,7 @@ async function fetchDetails(id: number, type: string) {
 
 	return {
 		recommendations: recc,
-		credits: credits,
+		credits: cred,
 		keywords: keyw,
 		videos: vid,
 		reviews: rev,
@@ -81,6 +86,7 @@ const Details = ({ result, setLoading }: Props) => {
 	}, [value]);
 	useEffect(() => {
 		if (result?.id) {
+			setLoading(true);
 			fetchDetails(result.id, result.media_type).then((data) => {
 				setDetailsData(data);
 				setLoading(false);
