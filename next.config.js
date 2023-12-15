@@ -1,4 +1,10 @@
 /** @type {import('next').NextConfig} */
+
+const withPWA = require('next-pwa')({
+	dest: 'public',
+	swSrc: 'service-worker.ts',
+});
+
 const nextConfig = {
 	eslint: {
 		ignoreDuringBuilds: true,
@@ -37,4 +43,4 @@ const nextConfig = {
 	},
 };
 
-module.exports = nextConfig;
+module.exports = withPWA(nextConfig);

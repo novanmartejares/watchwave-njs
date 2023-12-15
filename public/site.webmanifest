@@ -1,0 +1,60 @@
+{
+	"display": "standalone",
+	"short_name": "WatchWave",
+	"name": "WatchWave",
+	"theme_color": "#000000",
+	"background_color": "#000000",
+	"start_url": "/",
+	"shortcuts": [
+		{
+			"name": "Home",
+			"description": "Go to the home page",
+			"url": "/",
+			"icons": [
+				{
+					"src": "manifest-icon-192.maskable.png",
+					"sizes": "192x192",
+					"type": "image/png"
+				}
+			]
+		},
+		{
+			"name": "Search",
+			"description": "Search for a video",
+			"url": "/search",
+			"icons": [
+				{
+					"src": "manifest-icon-192.maskable.png",
+					"sizes": "192x192",
+					"type": "image/png"
+				}
+			]
+		}
+	],
+	"icons": [
+		{
+			"src": "manifest-icon-192.maskable.png",
+			"sizes": "192x192",
+			"type": "image/png",
+			"purpose": "any"
+		},
+		{
+			"src": "manifest-icon-192.maskable.png",
+			"sizes": "192x192",
+			"type": "image/png",
+			"purpose": "maskable"
+		},
+		{
+			"src": "manifest-icon-512.maskable.png",
+			"sizes": "512x512",
+			"type": "image/png",
+			"purpose": "any"
+		},
+		{
+			"src": "manifest-icon-512.maskable.png",
+			"sizes": "512x512",
+			"type": "image/png",
+			"purpose": "maskable"
+		}
+	]
+}

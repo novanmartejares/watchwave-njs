@@ -2,7 +2,7 @@
 import React, { useEffect, useState } from 'react';
 import EpisodeCard from './EpisodeCard';
 import { Episode, Season } from '@/types';
-import { SwiperSlide, Swiper, useSwiper } from 'swiper/react';
+import { SwiperSlide, Swiper } from 'swiper/react';
 import { FreeMode, Mousewheel, Scrollbar } from 'swiper/modules';
 import './episode.css';
 

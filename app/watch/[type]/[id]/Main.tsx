@@ -374,7 +374,7 @@ const Main = ({ params }: { params: { type: string; id: number } }) => {
 								</div>
 								<div className="relative w-full"></div>
 							</div>
-							<Details result={result} />
+							<Details result={result} setLoading={setIsLoading} />
 						</>
 					) : type === 'tv' && result && 'seasons' in result ? (
 						<>
