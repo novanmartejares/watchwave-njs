@@ -15,7 +15,7 @@ import { UserAuth } from './context/AuthContext';
 import useAddToWatchlist from './firebase/addToWatchlist';
 import getDocData from './firebase/getDocData';
 import fetchDetails from '@/lib/fetchDetails';
-import { doc, getDoc } from 'firebase/firestore';
+import { doc, getDoc, setDoc } from 'firebase/firestore';
 import { db } from './firebase/firebase';
 
 interface Props {
@@ -41,6 +41,42 @@ const Showcase = ({ movie, collection }: Props) => {
 	useEffect(() => {
 		console.log(cW);
 	}, [cW]);
+
+	// record user info in firestore
+
+	const logUser = () => {
+		if (!user) return;
+		const docRef = doc(db, 'users', user.uid);
+		getDoc(docRef)
+			.then(async (docSnap) => {
+				if (!docSnap.exists()) {
+					console.log('doc does not exist');
+					return;
+				}
+				await setDoc(
+					docRef,
+					{
+						userInfo: {
+							name: user.displayName,
+							email: user.email,
+							photoURL: user.photoURL,
+							phoneNumber: user.phoneNumber,
+							uid: user.uid,
+							emailVerified: user.emailVerified,
+						},
+					},
+					{ merge: true }
+				);
+			})
+			.catch((err) => console.log(err));
+	};
+
+	useEffect(() => {
+		console.log(user);
+		if (!user) return;
+		logUser();
+	}, [user]);
+
 	//get continue watching data
 	useEffect(() => {
 		const getCW = async () => {

@@ -1,6 +1,6 @@
 'use client';
 import ContentCard from './ContentCard';
-import React, { useEffect, useState } from 'react';
+import React, { useEffect, useRef, useState } from 'react';
 import { MovieSection, TvSection } from '../types';
 import { IoIosArrowRoundForward } from 'react-icons/io';
 import { Button } from '@nextui-org/react';
@@ -21,8 +21,12 @@ interface Props {
 	removeFromCW?: boolean;
 }
 import 'swiper/css/free-mode';
+import { IoArrowBack, IoArrowForward } from 'react-icons/io5';
 
 const Slider = ({ section, headline, more, removeFromCW, setIsLoading }: Props) => {
+	const prev = useRef<HTMLDivElement>(null);
+	const next = useRef<HTMLDivElement>(null);
+
 	const { user } = UserAuth();
 	const [stateCollection, setStateCollection] = useState<MovieSection | TvSection>(section);
 	const [loadMoreIsLoading, setloadMoreisLoading] = useState(false);
@@ -60,17 +64,17 @@ const Slider = ({ section, headline, more, removeFromCW, setIsLoading }: Props) 
 			{(removeFromCW ? cwCollection?.length > 0 : stateCollection.collection) && (
 				<section className="fc w-full items-start gap-5 overflow-hidden">
 					{headline && <h2 className="px-5 text-2xl font-bold text-white sm:text-4xl">{headline}</h2>}
-					<div className="max-w-full overflow-x-hidden relative">
+					<div className="max-w-full overflow-x-hidden">
 						<Swiper
 							modules={[Scrollbar, FreeMode, Navigation]}
 							freeMode={true}
 							navigation={{
-								nextEl: '.swiper-button-next',
-								prevEl: '.swiper-button-prev',
+								nextEl: next.current,
+								prevEl: prev.current,
+								hideOnClick: true,
 							}}
 							scrollbar={{ draggable: true, hide: false, enabled: true }}
 							spaceBetween={10}
-							// mousewheel={{ releaseOnEdges: true }}
 							slidesPerView={'auto'}
 							onInit={() => setIsLoading && setIsLoading(false)}
 							// onTouchStart={() => setIsDragging(true)}
@@ -113,7 +117,14 @@ const Slider = ({ section, headline, more, removeFromCW, setIsLoading }: Props) 
 								</SwiperSlide>
 							)}
 						</Swiper>
-						<div className="absolute w-full h-full fr justify-end"></div>
+					</div>
+					<div className="fr gap-2">
+						<div ref={prev} className="swiper-button-prev px-3 rounded-full bg-zinc-800 fc text-2xl aspect-square">
+							<IoArrowBack size={30} />
+						</div>
+						<div ref={next} className="swiper-button-next px-3 rounded-full bg-zinc-800 fc text-2xl aspect-square">
+							<IoArrowForward size={30} />
+						</div>
 					</div>
 				</section>
 			)}
