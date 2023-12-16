@@ -11,7 +11,7 @@ import { useDocumentData } from 'react-firebase-hooks/firestore';
 import { UserAuth } from '@/app/context/AuthContext';
 import fetchDetails from '@/lib/fetchDetails';
 import { Swiper, SwiperSlide } from 'swiper/react';
-import { Scrollbar, FreeMode, Mousewheel } from 'swiper/modules';
+import { Scrollbar, FreeMode, Navigation } from 'swiper/modules';
 
 interface Props {
 	section: MovieSection | TvSection;
@@ -60,10 +60,14 @@ const Slider = ({ section, headline, more, removeFromCW, setIsLoading }: Props) 
 			{(removeFromCW ? cwCollection?.length > 0 : stateCollection.collection) && (
 				<section className="fc w-full items-start gap-5 overflow-hidden">
 					{headline && <h2 className="px-5 text-2xl font-bold text-white sm:text-4xl">{headline}</h2>}
-					<div className="max-w-full overflow-x-hidden">
+					<div className="max-w-full overflow-x-hidden relative">
 						<Swiper
-							modules={[Scrollbar, FreeMode]}
+							modules={[Scrollbar, FreeMode, Navigation]}
 							freeMode={true}
+							navigation={{
+								nextEl: '.swiper-button-next',
+								prevEl: '.swiper-button-prev',
+							}}
 							scrollbar={{ draggable: true, hide: false, enabled: true }}
 							spaceBetween={10}
 							// mousewheel={{ releaseOnEdges: true }}
@@ -109,6 +113,7 @@ const Slider = ({ section, headline, more, removeFromCW, setIsLoading }: Props) 
 								</SwiperSlide>
 							)}
 						</Swiper>
+						<div className="absolute w-full h-full fr justify-end"></div>
 					</div>
 				</section>
 			)}
