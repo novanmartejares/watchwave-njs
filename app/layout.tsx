@@ -6,10 +6,20 @@ import AppContainer from './AppContainer';
 import BottomNavbar from '@/components/BottomNavbar';
 import { Toaster } from 'react-hot-toast';
 import { SpeedInsights } from '@vercel/speed-insights/next';
+import { Viewport } from 'next';
 
 const inter = Inter({ subsets: ['latin'] });
 import { Analytics } from '@vercel/analytics/react';
 
+export const viewport: Viewport = {
+	themeColor: 'black',
+	initialScale: 1,
+	viewportFit: 'cover',
+	width: 'device-width',
+	userScalable: false,
+	minimumScale: 1,
+	maximumScale: 1,
+};
 export const metadata: Metadata = {
 	metadataBase: new URL('https://watchwave-v2.vercel.app/'),
 	title: 'WatchWave',
@@ -36,6 +46,16 @@ export default function RootLayout({ children }: { children: React.ReactNode }) 
 	return (
 		<html lang="en">
 			<head>
+				{/* <meta name="viewport" content="width=device-width, initial-scale=1, viewport-fit=cover" /> */}
+				<meta name="apple-mobile-web-app-capable" content="yes" />
+				<meta name="apple-mobile-web-app-title" content="PWA" />
+				<meta name="apple-mobile-web-app-status-bar-style" content="black-translucent" />
+				<meta name="theme-color" content="#000000" />
+				<meta name="google-site-verification" content="Gcyd07cXVfBhdhqUYr1kcvOREY1WCL07XUDzDy1VKdQ" />
+				<link rel="icon" type="image/svg+xml" href="/favicon.svg" />
+				<link rel="manifest" href="/site.webmanifest" />
+				<link rel="icon" type="image/png" sizes="196x196" href="/favicon-196.png" />
+				<link rel="apple-touch-icon" href="/apple-icon-180.png" />
 				<link
 					rel="apple-touch-startup-image"
 					href="/apple-splash-2048-2732.jpg"
@@ -186,16 +206,6 @@ export default function RootLayout({ children }: { children: React.ReactNode }) 
 					href="/apple-splash-1136-640.jpg"
 					media="(device-width: 320px) and (device-height: 568px) and (-webkit-device-pixel-ratio: 2) and (orientation: landscape)"
 				/>
-				<meta name="viewport" content="width=device-width, initial-scale=1, viewport-fit=cover" />
-				<meta name="apple-mobile-web-app-capable" content="yes" />
-				<meta name="apple-mobile-web-app-title" content="PWA" />
-				<meta name="apple-mobile-web-app-status-bar-style" content="black-translucent" />
-				<meta name="theme-color" content="#000000" />
-				<meta name="google-site-verification" content="Gcyd07cXVfBhdhqUYr1kcvOREY1WCL07XUDzDy1VKdQ" />
-				<link rel="icon" type="image/svg+xml" href="/favicon.svg" />
-				<link rel="manifest" href="/site.webmanifest" />
-				<link rel="icon" type="image/png" sizes="196x196" href="/favicon-196.png" />
-				<link rel="apple-touch-icon" href="/apple-icon-180.png" />
 			</head>
 			<body style={{ WebkitTapHighlightColor: 'transparent' }} className={inter.className + 'bg-background text-foreground dark'}>
 				<AppContainer>

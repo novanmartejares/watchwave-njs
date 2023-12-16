@@ -1,5 +1,5 @@
 import options from '@/lib/options';
-import { Metadata, ResolvingMetadata } from 'next';
+import { Metadata } from 'next';
 import Main from './Main';
 import { cookies } from 'next/headers';
 
@@ -7,7 +7,7 @@ type Props = {
 	params: { type: string; id: number };
 };
 
-export async function generateMetadata({ params }: Props, parent: ResolvingMetadata): Promise<Metadata> {
+export async function generateMetadata({ params }: Props): Promise<Metadata> {
 	// read route params
 	const id = params.id;
 	const type = params.type;
@@ -30,7 +30,7 @@ export async function generateMetadata({ params }: Props, parent: ResolvingMetad
 	}
 
 	// get image url from
-	const image = content.backdrop_path || content.poster_path;
+	const image = content.poster_path || content.poster_path;
 
 	return {
 		title: `WatchWave`,
@@ -42,7 +42,7 @@ export async function generateMetadata({ params }: Props, parent: ResolvingMetad
 			type: 'website',
 			url: `https://watchwave.github.io/watch/${type}/${id}`,
 			title: `Watch ${content.title || content.name} for free on WatchWave`,
-			images: [image && { url: `https://image.tmdb.org/t/p/w1280${image}` }],
+			images: [image && { url: `/api/og?img=${image}&title=${content.title || content.name}` }],
 		},
 	};
 }

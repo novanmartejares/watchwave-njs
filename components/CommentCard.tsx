@@ -23,11 +23,12 @@ const CommentCard = ({ comment, user }: Props) => {
 		const hours = date.getHours() > 12 ? date.getHours() - 12 : date.getHours();
 		const minutes = date.getMinutes() < 10 ? `0${date.getMinutes()}` : date.getMinutes();
 
-		return `${month} ${date.getDate()}, ${date.getFullYear()} • ${hours}:${minutes} ${date.getHours() > 12 ? 'AM' : 'PM'}`;
+		return `${month} ${date.getDate()}, ${date.getFullYear()} • ${hours}:${minutes} ${date.getHours() > 12 ? 'PM' : 'AM'}`;
 	};
 
 	return (
 		<motion.div
+			key={comment.uuid}
 			initial={{ opacity: 0, width: '0px', minWidth: '0px' }}
 			animate={{ opacity: 1, width: 'auto', minWidth: '280px' }}
 			exit={{ opacity: 0, width: '0px', minWidth: '0px' }}

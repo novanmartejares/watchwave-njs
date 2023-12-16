@@ -6,6 +6,16 @@
 
 ---
 
+## 2.2.3
+
+-   ESLint and loading updates
+-   Error handling and interface enhancements
+-   Layout and Navbar styling adjustments
+-   User logging and Swiper navigation in Showcase.tsx
+-   Slider freemode removed, navigation refined
+-   Viewport fixed
+-   General codebase improvements
+
 ## 2.2.0
 
 -   Added ESLint rule for no-unused-vars.

@@ -24,8 +24,8 @@ import 'swiper/css/free-mode';
 import { IoArrowBack, IoArrowForward } from 'react-icons/io5';
 
 const Slider = ({ section, headline, more, removeFromCW, setIsLoading }: Props) => {
-	const prev = useRef<HTMLDivElement>(null);
-	const next = useRef<HTMLDivElement>(null);
+	const prev = useRef<HTMLButtonElement>(null);
+	const next = useRef<HTMLButtonElement>(null);
 
 	const { user } = UserAuth();
 	const [stateCollection, setStateCollection] = useState<MovieSection | TvSection>(section);
@@ -66,8 +66,8 @@ const Slider = ({ section, headline, more, removeFromCW, setIsLoading }: Props) 
 					{headline && <h2 className="px-5 text-2xl font-bold text-white sm:text-4xl">{headline}</h2>}
 					<div className="max-w-full overflow-x-hidden">
 						<Swiper
-							modules={[Scrollbar, FreeMode, Navigation]}
-							freeMode={true}
+							modules={[Scrollbar, Navigation]}
+							// freeMode={true}
 							navigation={{
 								nextEl: next.current,
 								prevEl: prev.current,
@@ -118,13 +118,13 @@ const Slider = ({ section, headline, more, removeFromCW, setIsLoading }: Props) 
 							)}
 						</Swiper>
 					</div>
-					<div className="fr gap-2">
-						<div ref={prev} className="swiper-button-prev px-3 rounded-full bg-zinc-800 fc text-2xl aspect-square">
+					<div className="fr gap-2 pl-4">
+						<Button ref={prev} className="swiper-button-prev px-6 py-1 rounded-full bg-foreground-300 text-black">
 							<IoArrowBack size={30} />
-						</div>
-						<div ref={next} className="swiper-button-next px-3 rounded-full bg-zinc-800 fc text-2xl aspect-square">
+						</Button>
+						<Button ref={next} className="swiper-button-next px-6 py-1 rounded-full bg-foreground-300 text-black">
 							<IoArrowForward size={30} />
-						</div>
+						</Button>
 					</div>
 				</section>
 			)}
