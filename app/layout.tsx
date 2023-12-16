@@ -5,6 +5,7 @@ import Navbar from '../components/Navbar';
 import AppContainer from './AppContainer';
 import BottomNavbar from '@/components/BottomNavbar';
 import { Toaster } from 'react-hot-toast';
+import { SpeedInsights } from '@vercel/speed-insights/next';
 
 const inter = Inter({ subsets: ['latin'] });
 import { Analytics } from '@vercel/analytics/react';
@@ -203,6 +204,7 @@ export default function RootLayout({ children }: { children: React.ReactNode }) 
 					<BottomNavbar />
 					{children}
 					<Analytics />
+					<SpeedInsights />
 				</AppContainer>
 			</body>
 		</html>
