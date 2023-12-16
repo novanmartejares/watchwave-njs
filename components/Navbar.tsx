@@ -130,7 +130,7 @@ const Navbar = () => {
 	];
 
 	return (
-		<div className="fixed z-10 w-full bg-black/20 px-5 backdrop-blur-xl sm:h-full sm:w-auto sm:bg-transparent sm:backdrop-blur-none  standalone:pt-10">
+		<div className="fixed z-20 w-full bg-black/20 px-5 backdrop-blur-xl sm:h-full sm:w-auto sm:bg-transparent sm:backdrop-blur-none  standalone:pt-10">
 			<div className="fr sm:fc justify-between text-2xl sm:justify-center sm:px-10 sm:pt-0 w-full h-full">
 				{icons.map((icon, i) => (
 					<Fragment key={icon.path + i}>
