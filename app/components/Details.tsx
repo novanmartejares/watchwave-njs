@@ -1,5 +1,5 @@
 'use client';
-import options from '@/lib/options';
+import options from '@/app/lib/options';
 import { MovieDetails, ShowDetails, castProps, genresProps, keywordProps, recommendationProps, reviewProps, videoProps } from '@/types';
 import { Chip, Tooltip } from '@nextui-org/react';
 import Image from 'next/image';
@@ -9,7 +9,7 @@ import Video from './Video';
 import Review from './Review';
 import Slider from './Slider';
 import CommentSlider from './CommentSlider';
-import { db } from '@/app/firebase/firebase';
+import { db } from '@/app/lib/firebase/firebase';
 import { doc } from 'firebase/firestore';
 import { UserAuth } from '@/app/context/AuthContext';
 import { useDocumentData } from 'react-firebase-hooks/firestore';

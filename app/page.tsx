@@ -1,7 +1,7 @@
-import options from '../lib/options';
+import options from './lib/options';
 import Showcase from './Showcase';
 import { Movie, MovieDetails, Show, fetchResults } from '../types';
-import fetchDetails from '@/lib/fetchDetails';
+import fetchDetails from '@/app/lib/fetchDetails';
 
 async function fetchData() {
 	//////////////////////////

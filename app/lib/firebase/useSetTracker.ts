@@ -2,7 +2,7 @@
 
 import { doc, setDoc, arrayUnion, arrayRemove, getDoc } from 'firebase/firestore';
 import { auth, db } from './firebase';
-import { UserAuth } from '../context/AuthContext';
+import { UserAuth } from '../../context/AuthContext';
 
 const useSetTracker = () => {
 	const { user } = UserAuth();

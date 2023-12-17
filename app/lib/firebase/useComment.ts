@@ -17,7 +17,7 @@ import {
 	updateDoc,
 } from 'firebase/firestore';
 import { db } from './firebase';
-import { UserAuth } from '../context/AuthContext';
+import { UserAuth } from '../../context/AuthContext';
 import { v4 as uuidv4 } from 'uuid';
 
 const useComment = () => {

@@ -1,4 +1,4 @@
-import useComment from '@/app/firebase/useComment';
+import useComment from '@/app/lib/firebase/useComment';
 import { Comment } from '@/types';
 import { Button } from '@nextui-org/react';
 import { User } from 'firebase/auth';

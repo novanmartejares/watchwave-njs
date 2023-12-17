@@ -1,6 +1,6 @@
 'use client';
 import React, { Fragment } from 'react';
-import { IoCog, IoFilm, IoHome, IoSearch, IoTv, IoListOutline } from 'react-icons/io5';
+import { IoHome, IoSearch, IoListOutline } from 'react-icons/io5';
 import { usePathname } from 'next/navigation';
 import Link from 'next/link';
 import { Button, Dropdown, DropdownItem, DropdownMenu, DropdownTrigger, Tooltip } from '@nextui-org/react';
@@ -15,14 +15,7 @@ const Navbar = () => {
 			path: '/',
 			link: true,
 			icon: (
-				<svg
-					className="h-10 sm:absolute sm:top-10 landscape:!static landscape:!top-0"
-					width="90"
-					height="81"
-					viewBox="0 0 90 81"
-					fill="none"
-					xmlns="http://www.w3.org/2000/svg"
-				>
+				<svg className="h-10" width="90" height="81" viewBox="0 0 90 81" fill="none" xmlns="http://www.w3.org/2000/svg">
 					<path
 						className="fill-white"
 						d="M0 10.2062V10.2062C8.68276 5.19325 19.7777 7.99117 25.0449 16.5221L58.5 70.7062V70.7062C49.8172 75.7192 38.7223 72.9213 33.4551 64.3904L0 10.2062Z"
@@ -88,7 +81,7 @@ const Navbar = () => {
 			// title: "Account",
 			link: false,
 			icon: (
-				<div className="h-10 sm:absolute sm:bottom-10 landscape:!static landscape:!bottom-0">
+				<div className="h-10">
 					{typeof user !== 'string' && (
 						<>
 							{user?.photoURL ? (
@@ -131,7 +124,7 @@ const Navbar = () => {
 
 	return (
 		<div className="fixed z-20 w-full bg-black/20 px-5 backdrop-blur-xl sm:h-full sm:w-auto sm:bg-transparent sm:backdrop-blur-none  standalone:pt-10 pointer-events-none">
-			<div className="fr sm:fc justify-between text-2xl sm:justify-center sm:px-10 sm:pt-0 w-full h-full pointer-events-auto">
+			<div className="fr sm:fc justify-between text-2xl sm:justify-center sm:px-10 sm:pt-0 w-full h-full pointer-events-auto relative">
 				{icons.map((icon, i) => (
 					<Fragment key={icon.path + i}>
 						{icon.link !== false ? (

@@ -1,11 +1,11 @@
 'use client';
 import { UserAuth } from '@/app/context/AuthContext';
-import useAddToContinueWatching from '@/app/firebase/addToContinueWatching';
-import useAddToWatchlist from '@/app/firebase/addToWatchlist';
+import useAddToContinueWatching from '@/app/lib/firebase/addToContinueWatching';
+import useAddToWatchlist from '@/app/lib/firebase/addToWatchlist';
 import Loading from '@/app/loading';
-import Details from '@/components/Details';
-import EpisodeSlider from '@/components/EpisodeSlider';
-import options from '@/lib/options';
+import Details from '@/app/components/Details';
+import EpisodeSlider from '@/app/components/EpisodeSlider';
+import options from '@/app/lib/options';
 import { Episode, MovieDetails, ShowDetails } from '@/types';
 import {
 	Button,
@@ -27,11 +27,11 @@ import Image from 'next/image';
 import React, { useEffect, useState } from 'react';
 import { BsChevronDown } from 'react-icons/bs';
 import { IoCheckmark, IoAdd, IoRemove, IoArrowDown } from 'react-icons/io5';
-import Footer from '@/components/Footer';
+import Footer from '@/app/components/Footer';
 import { DetectAdblock } from '@scthakuri/adblock-detector';
-import useSetTracker from '@/app/firebase/useSetTracker';
+import useSetTracker from '@/app/lib/firebase/useSetTracker';
 import { doc } from 'firebase/firestore';
-import { db } from '@/app/firebase/firebase';
+import { db } from '@/app/lib/firebase/firebase';
 import { useDocumentData } from 'react-firebase-hooks/firestore';
 
 const Main = ({ params }: { params: { type: string; id: number } }) => {

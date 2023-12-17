@@ -3,7 +3,7 @@ import { Swiper, SwiperSlide } from 'swiper/react';
 import CommentCard from './CommentCard';
 import { Comment, Comments } from '@/types';
 import { Button, Input } from '@nextui-org/react';
-import useComment from '@/app/firebase/useComment';
+import useComment from '@/app/lib/firebase/useComment';
 import { User } from 'firebase/auth';
 import toast from 'react-hot-toast';
 import { AnimatePresence } from 'framer-motion';

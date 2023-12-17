@@ -1,6 +1,6 @@
 import { collection, doc, getFirestore, setDoc, arrayUnion, arrayRemove } from 'firebase/firestore';
 import { auth, db } from './firebase';
-import { UserAuth } from '../context/AuthContext';
+import { UserAuth } from '../../context/AuthContext';
 
 const useAddToWatchlist = (type: string | null | undefined, id: number | null | undefined) => {
 	const { user } = UserAuth();

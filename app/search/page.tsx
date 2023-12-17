@@ -1,8 +1,8 @@
 'use client';
 import Loading from '@/app/loading';
-import ContentCard from '@/components/ContentCard';
-import Footer from '@/components/Footer';
-import options from '@/lib/options';
+import ContentCard from '@/app/components/ContentCard';
+import Footer from '@/app/components/Footer';
+import options from '@/app/lib/options';
 import { Movie, SearchResultsProps, Show } from '@/types';
 import { Button, Input, Slider } from '@nextui-org/react';
 import { useRouter, useSearchParams } from 'next/navigation';

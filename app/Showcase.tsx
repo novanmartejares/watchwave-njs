@@ -7,16 +7,16 @@ import { MovieDetails, fetchResults } from '../types';
 import { Button, Modal, ModalBody, ModalContent, ModalFooter, ModalHeader, useDisclosure } from '@nextui-org/react';
 import { IoAdd, IoCheckmark, IoPlay } from 'react-icons/io5';
 
-import Slider from '@/components/Slider';
-import Footer from '@/components/Footer';
+import Slider from '@/app/components/Slider';
+import Footer from '@/app/components/Footer';
 import { Animation } from './Animation';
 import { useRouter } from 'next/navigation';
 import { UserAuth } from './context/AuthContext';
-import useAddToWatchlist from './firebase/addToWatchlist';
-import getDocData from './firebase/getDocData';
-import fetchDetails from '@/lib/fetchDetails';
+import useAddToWatchlist from './lib/firebase/addToWatchlist';
+import getDocData from './lib/firebase/getDocData';
+import fetchDetails from '@/app/lib/fetchDetails';
 import { doc, getDoc, setDoc } from 'firebase/firestore';
-import { db } from './firebase/firebase';
+import { db } from './lib/firebase/firebase';
 
 interface Props {
 	movie: MovieDetails;

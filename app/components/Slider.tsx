@@ -1,15 +1,15 @@
 'use client';
 import ContentCard from './ContentCard';
 import React, { useEffect, useRef, useState } from 'react';
-import { MovieSection, TvSection } from '../types';
+import { MovieSection, TvSection } from '../../types';
 import { IoIosArrowRoundForward } from 'react-icons/io';
 import { Button } from '@nextui-org/react';
-import { loadMore } from '@/lib/loadMore';
-import { db } from '@/app/firebase/firebase';
+import { loadMore } from '@/app/lib/loadMore';
+import { db } from '@/app/lib/firebase/firebase';
 import { doc } from 'firebase/firestore';
 import { useDocumentData } from 'react-firebase-hooks/firestore';
 import { UserAuth } from '@/app/context/AuthContext';
-import fetchDetails from '@/lib/fetchDetails';
+import fetchDetails from '@/app/lib/fetchDetails';
 import { Swiper, SwiperSlide } from 'swiper/react';
 import { Scrollbar, FreeMode, Navigation } from 'swiper/modules';
 

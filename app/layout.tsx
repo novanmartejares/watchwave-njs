@@ -1,15 +1,16 @@
 import type { Metadata } from 'next';
 import { Inter } from 'next/font/google';
 import './globals.css';
-import Navbar from '../components/Navbar';
+import Navbar from './components/Navbar';
 import AppContainer from './AppContainer';
-import BottomNavbar from '@/components/BottomNavbar';
+import BottomNavbar from '@/app/components/BottomNavbar';
 import { Toaster } from 'react-hot-toast';
 import { SpeedInsights } from '@vercel/speed-insights/next';
 import { Viewport } from 'next';
 
 const inter = Inter({ subsets: ['latin'] });
 import { Analytics } from '@vercel/analytics/react';
+import SetDefaultLS from './lib/SetDefaultLS';
 
 export const viewport: Viewport = {
 	themeColor: 'black',
@@ -207,7 +208,7 @@ export default function RootLayout({ children }: { children: React.ReactNode }) 
 					media="(device-width: 320px) and (device-height: 568px) and (-webkit-device-pixel-ratio: 2) and (orientation: landscape)"
 				/>
 			</head>
-			<body style={{ WebkitTapHighlightColor: 'transparent' }} className={inter.className + 'bg-background text-foreground dark'}>
+			<body style={{ WebkitTapHighlightColor: 'transparent' }} className={inter.className + ' bg-background text-foreground dark'}>
 				<AppContainer>
 					<Navbar />
 					<Toaster />
@@ -215,6 +216,7 @@ export default function RootLayout({ children }: { children: React.ReactNode }) 
 					{children}
 					<Analytics />
 					<SpeedInsights />
+					{/* <SetDefaultLS /> */}
 				</AppContainer>
 			</body>
 		</html>

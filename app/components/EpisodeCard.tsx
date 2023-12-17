@@ -1,5 +1,5 @@
 'use client';
-import useSetTracker from '@/app/firebase/useSetTracker';
+import useSetTracker from '@/app/lib/firebase/useSetTracker';
 import { Episode } from '@/types';
 import Image from 'next/image';
 import React, { useEffect } from 'react';
