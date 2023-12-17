@@ -244,7 +244,7 @@ const Main = ({ params }: { params: { type: string; id: number } }) => {
 
 	return (
 		<>
-			<div className="min-h-screen w-full overflow-hidden bg-background text-foreground dark pt-16">
+			<div className="min-h-screen w-full overflow-hidden bg-background text-foreground dark">
 				{(isLoading || loading) && <Loading />}
 				<Modal isOpen={adb.isOpen} onOpenChange={adb.onOpenChange}>
 					<ModalContent>
@@ -313,7 +313,7 @@ const Main = ({ params }: { params: { type: string; id: number } }) => {
 						</ModalContent>
 					</Modal>
 				)}
-				<div className="w-full overflow-hidden sm:pl-28 md:pl-36">
+				<div className="w-full overflow-hidden sm:pl-28 md:pl-36 pt-16 sm:pt-8">
 					{type === 'movie' && result && 'title' in result ? (
 						<>
 							<div className="relative z-10 h-full w-full sm:px-5">
