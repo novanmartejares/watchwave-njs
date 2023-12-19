@@ -33,7 +33,7 @@ export async function generateMetadata({ params }: Props): Promise<Metadata> {
 	const image = content.poster_path || content.poster_path;
 
 	return {
-		title: `${content.title || content.name} | WatchWave}`,
+		title: `${content.title || content.name} | WatchWave`,
 		keywords:
 			'watch movies, movies online, watch TV, TV online, TV shows online, watch TV shows, stream movies, stream tv, instant streaming, watch online, movies, watch movies United States, watch TV online, no download, full length movies watch online, movies online, movies, watch movies online, watch movies, watch movies online free, watch movies for free, watch streaming media, watch tv online, watch movies online, watch movies online free, watch movies for free, watch streaming media, watch tv online, ' +
 			keywordsArray.join(', '),

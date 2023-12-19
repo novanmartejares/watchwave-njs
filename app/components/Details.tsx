@@ -40,7 +40,7 @@ async function fetchDetails(id: number, type: string) {
 		cast.imdb_id = ext.imdb_id;
 	});
 
-	console.log(credits);
+	// console.log(credits);
 
 	const keywords = await fetch(`https://api.themoviedb.org/3/${type}/${id}/keywords?language=en-US`, options);
 	let keyw = await keywords.json();
@@ -77,7 +77,7 @@ interface DetailsData {
 }
 
 const Details = ({ result, setIsLoading }: Props) => {
-	console.log(setIsLoading);
+	// console.log(setIsLoading);
 	const [detailsData, setDetailsData] = useState<DetailsData | null>(null);
 	const { user } = UserAuth();
 	const [value, loading, error] = useDocumentData(doc(db, 'commentsCollection/' + result?.media_type));

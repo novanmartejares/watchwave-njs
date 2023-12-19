@@ -33,6 +33,7 @@ import useSetTracker from '@/app/lib/firebase/useSetTracker';
 import { doc } from 'firebase/firestore';
 import { db } from '@/app/lib/firebase/firebase';
 import { useDocumentData } from 'react-firebase-hooks/firestore';
+import VideoPlayer from '@/app/components/VideoPlayer';
 
 const Main = ({ params }: { params: { type: string; id: number } }) => {
 	const { id, type } = params;
