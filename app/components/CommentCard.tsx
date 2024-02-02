@@ -1,6 +1,7 @@
 import useComment from '@/app/lib/firebase/useComment';
 import { Comment } from '@/types';
 import { Button } from '@nextui-org/react';
+import { format } from 'date-fns';
 import { User } from 'firebase/auth';
 import { motion } from 'framer-motion';
 import Image from 'next/image';
@@ -15,16 +16,7 @@ interface Props {
 const CommentCard = ({ comment, user }: Props) => {
 	const { deleteC, likeComment } = useComment();
 	if (!comment) return null;
-
-	const getDate = () => {
-		const date = new Date(comment.createdAt);
-		const month = date.toLocaleString('default', { month: 'short' });
-		// time in 12 hour format
-		const hours = date.getHours() > 12 ? date.getHours() - 12 : date.getHours();
-		const minutes = date.getMinutes() < 10 ? `0${date.getMinutes()}` : date.getMinutes();
-
-		return `${month} ${date.getDate()}, ${date.getFullYear()} • ${hours}:${minutes} ${date.getHours() > 12 ? 'PM' : 'AM'}`;
-	};
+	console.log(comment);
 
 	return (
 		<motion.div
@@ -45,9 +37,13 @@ const CommentCard = ({ comment, user }: Props) => {
 				<div className="fc gap-3 justify-start items-start">
 					<div className="fr gap-2 w-full items-start justify-start">
 						<Image src={comment.photoURL} width={40} height={40} alt="profile picture" className="w-10 h-10 rounded-full" />
-						<div className="fc gap-1 justify-start items-start">
+						<div className="fc justify-start items-start">
 							<h4 className="text-lg font-bold">{comment.name}</h4>
-							<p className="text-sm text-zinc-400">{getDate()}</p>
+							<p className="text-sm text-zinc-400">
+								{/* created at timestamp example "2024-02-02T05:48:00.598Z" */}
+								{/* format with date-fns into example format: May 5, 2024 • 5:32 PM */}
+								{format(new Date(comment.createdAt), 'MMM d, yyyy • h:mm a')}
+							</p>
 						</div>
 					</div>
 					<p className="text-sm w-full">{comment.comment}</p>

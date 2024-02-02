@@ -1,14 +1,7 @@
 .swiper-wrapper {
-  @apply py-4;
-}
-
-.swiper-scrollbar {
-  @apply mt-1 bg-foreground-300;
+	@apply py-4;
 }
 .swiper-horizontal > .swiper-scrollbar,
 .swiper-scrollbar.swiper-scrollbar-horizontal {
-  @apply h-1 w-full;
-}
-.swiper-scrollbar-drag {
-  @apply bg-foreground-500;
+	@apply h-1 w-full;
 }

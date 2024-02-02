@@ -34,7 +34,7 @@ const EpisodeSlider = ({ id, result, setEpisode, season, episode }: EpisodeSlide
 	}, [result]);
 
 	return (
-		<section className="fc w-full items-start gap-5 overflow-hidden py-2">
+		<section className="fc w-full items-start gap-5 overflow-hidden py-2 light">
 			<div className="max-w-full overflow-x-hidden">
 				<Swiper
 					modules={[Scrollbar, FreeMode, Mousewheel]}

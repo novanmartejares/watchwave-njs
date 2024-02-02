@@ -1,10 +1,10 @@
 'use client';
-import { motion, animate } from 'framer-motion';
+import { motion } from 'framer-motion';
 import { useEffect, useRef, useState } from 'react';
 
 import Image from 'next/image';
 import { MovieDetails, fetchResults } from '../types';
-import { Button, Modal, ModalBody, ModalContent, ModalFooter, ModalHeader, useDisclosure } from '@nextui-org/react';
+import { Button, useDisclosure } from '@nextui-org/react';
 import { IoAdd, IoCheckmark, IoPlay } from 'react-icons/io5';
 
 import Slider from '@/app/components/Slider';
@@ -17,6 +17,8 @@ import getDocData from './lib/firebase/getDocData';
 import fetchDetails from '@/app/lib/fetchDetails';
 import { doc, getDoc, setDoc } from 'firebase/firestore';
 import { db } from './lib/firebase/firebase';
+import { ModalManager } from './lib/ModalManager';
+import { format } from 'date-fns';
 
 interface Props {
 	movie: MovieDetails;
@@ -25,17 +27,13 @@ interface Props {
 
 const Showcase = ({ movie, collection }: Props) => {
 	const imageURL = `https://image.tmdb.org/t/p/original${movie.backdrop_path}`;
-	const getProperTime = (time: number) => {
-		const hours = Math.floor(time / 60);
-		const minutes = time % 60;
-		return `${hours}h ${minutes}m`;
-	};
+
 	const router = useRouter();
-	const { user, googleSignIn } = UserAuth();
+	const { user } = UserAuth();
 	const [isInWatchlist, setIsInWatchlist] = useState(false);
 	const [data, setData] = useState<any>(null);
 	const [isLoading, setIsLoading] = useState(true);
-	const { isOpen, onOpenChange, onOpen } = useDisclosure();
+	const { isOpen, onOpenChange, onOpen, onClose } = useDisclosure();
 	const { add, remove } = useAddToWatchlist('movie', movie.id);
 	const [cW, setCW] = useState(null);
 	useEffect(() => {
@@ -110,7 +108,7 @@ const Showcase = ({ movie, collection }: Props) => {
 					});
 				}
 			}
-
+			// set continue watching collection
 			if (continueWatching.length > 0) {
 				const continueWatchingCollection = {
 					heading: 'Continue Watching',
@@ -175,40 +173,7 @@ const Showcase = ({ movie, collection }: Props) => {
 	return (
 		<>
 			{isLoading && <Animation />}
-			<Modal isOpen={isOpen} onOpenChange={onOpenChange}>
-				<ModalContent>
-					{(onClose) => (
-						<>
-							<ModalHeader className="flex flex-col gap-1">Add to Watchlist</ModalHeader>
-							<ModalBody>
-								<p>You need to be logged in to add to watchlist.</p>
-							</ModalBody>
-							<ModalFooter>
-								<Button
-									onClick={() => {
-										onClose();
-									}}
-									variant="ghost"
-								>
-									Cancel
-								</Button>
-								<Button
-									onClick={() => {
-										try {
-											googleSignIn();
-											onClose();
-										} catch (e) {
-											console.log(e);
-										}
-									}}
-								>
-									Login
-								</Button>
-							</ModalFooter>
-						</>
-					)}
-				</ModalContent>
-			</Modal>
+			<ModalManager isOpen={isOpen} onOpenChange={onOpenChange} onClose={onClose} type="watchlist" />
 			<main className="min-h-screen w-full overflow-hidden bg-black light">
 				<div className="fc w-screen justify-start">
 					<motion.div initial={{ opacity: 0 }} animate={{ opacity: 1 }} transition={{ duration: 1 }} className="h-full w-full">
@@ -258,7 +223,12 @@ const Showcase = ({ movie, collection }: Props) => {
 											{movie.runtime && <li>•</li>}
 										</>
 									)}
-									{movie.runtime && <li>{getProperTime(movie.runtime)}</li>}
+									{movie.runtime && (
+										<li>
+											{/* minutes to minutes and hours with date-fns */}
+											{format(new Date(0, 0, 0, 0, movie.runtime), "h 'hr' m 'min'")}
+										</li>
+									)}
 								</ul>
 
 								<p className="mt-4 max-w-[50ch] text-base font-medium leading-normal text-white/80">{movie.overview}</p>

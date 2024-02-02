@@ -35,6 +35,7 @@ async function fetchDetails(id: number, type: string) {
 	// and then add it to the cast object as imdb_id in cred
 
 	await cred.cast.forEach(async (cast: castProps) => {
+		if (!cast.id) return;
 		const external = await fetch(`https://api.themoviedb.org/3/person/${cast.id}/external_ids`, options);
 		let ext = await external.json();
 		cast.imdb_id = ext.imdb_id;
@@ -212,12 +213,13 @@ const Details = ({ result, setIsLoading }: Props) => {
 													credits.cast.slice(0, 5).map((cast: castProps, i: number) => (
 														<Tooltip key={cast.name} content={cast.character}>
 															<span className="underline-offset-2 hover:underline">
-																<Link
+																<a
+																	target="_blank"
 																	href={`https://www.imdb.com/name/${cast.imdb_id}`}
 																	aria-label={`View details for ${cast.name}`}
 																>
 																	{cast.name + (i !== 4 ? ', ' : '')}
-																</Link>
+																</a>
 															</span>
 														</Tooltip>
 													))}
@@ -232,7 +234,7 @@ const Details = ({ result, setIsLoading }: Props) => {
 									</div>
 								</li>
 								{keywords?.keywords && keywords.keywords.length !== 0 && (
-									<li className="fr items-start justify-start gap-3 sm:col-span-2">
+									<li className="fr items-start  w-full justify-start gap-3 sm:col-span-2">
 										<div className="font-bold">Keywords</div>
 										<div className="fr flex-wrap justify-start gap-2">
 											{keywords.keywords.map((keyword: keywordProps, i: number) => (
@@ -254,11 +256,14 @@ const Details = ({ result, setIsLoading }: Props) => {
 							</div>
 						)}
 						{recommendations && recommendations.results && recommendations.results.length !== 0 && (
-							<div className="fc w-full justify-start my-10">
+							<div className="fc w-full justify-start my-10 light">
 								<h3 className="mb-5 text-3xl font-bold">More Like This</h3>
 								<Slider
 									section={{
 										collection: recommendations.results,
+										url: '', // Add the missing url property
+										page: 1, // Add the missing page property
+										heading: '', // Add the missing heading property
 									}}
 									more={false}
 								/>

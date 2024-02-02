@@ -1,49 +1,37 @@
 'use client';
 import { UserAuth } from '@/app/context/AuthContext';
-import useAddToContinueWatching from '@/app/lib/firebase/addToContinueWatching';
 import useAddToWatchlist from '@/app/lib/firebase/addToWatchlist';
+import useAddToContinueWatching from '@/app/lib/firebase/addToContinueWatching';
 import Loading from '@/app/loading';
 import Details from '@/app/components/Details';
 import EpisodeSlider from '@/app/components/EpisodeSlider';
 import options from '@/app/lib/options';
 import { Episode, MovieDetails, ShowDetails } from '@/types';
-import {
-	Button,
-	Dropdown,
-	DropdownItem,
-	DropdownMenu,
-	DropdownTrigger,
-	Link as NLink,
-	Modal,
-	ModalBody,
-	ModalContent,
-	ModalFooter,
-	ModalHeader,
-	useDisclosure,
-} from '@nextui-org/react';
-import Link from 'next/link';
+import { Button, Dropdown, DropdownItem, DropdownMenu, DropdownTrigger, useDisclosure } from '@nextui-org/react';
 import { motion } from 'framer-motion';
 import Image from 'next/image';
 import React, { useEffect, useState } from 'react';
 import { BsChevronDown } from 'react-icons/bs';
-import { IoCheckmark, IoAdd, IoRemove, IoArrowDown } from 'react-icons/io5';
+import { IoCheckmark, IoAdd, IoArrowDown } from 'react-icons/io5';
 import Footer from '@/app/components/Footer';
 import { DetectAdblock } from '@scthakuri/adblock-detector';
 import useSetTracker from '@/app/lib/firebase/useSetTracker';
 import { doc } from 'firebase/firestore';
 import { db } from '@/app/lib/firebase/firebase';
 import { useDocumentData } from 'react-firebase-hooks/firestore';
+import { ModalManager } from '@/app/lib/ModalManager';
+import { format } from 'date-fns';
 
 const Main = ({ params }: { params: { type: string; id: number } }) => {
 	const { id, type } = params;
 	const [result, setResult] = useState<MovieDetails | ShowDetails | null>(null);
-	const [season, setSeason] = useState(0);
-	const [episode, setEpisode] = useState(1);
+	const [season, setSeason] = useState<number>(0);
+	const [episode, setEpisode] = useState<number>(1);
 	const [source, setSource] = useState<number>(0);
-	const [isInWatchlist, setIsInWatchlist] = useState(false);
-	const [isInCW, setIsInCW] = useState(false);
+	const [isInWatchlist, setIsInWatchlist] = useState<boolean>(false);
 	const { user, googleSignIn } = UserAuth();
-	const [isLoading, setIsLoading] = useState(true);
+	const [isLoading, setIsLoading] = useState<boolean>(true);
+	const [isInFuture, setIsInFuture] = useState<boolean>(false);
 
 	const sourceCollectionMovie = [
 		`https://vidsrc.to/embed/movie/${id}`,
@@ -71,20 +59,24 @@ const Main = ({ params }: { params: { type: string; id: number } }) => {
 	const ca = useAddToContinueWatching(result?.media_type, result?.id);
 	const { set } = useSetTracker();
 
+	// if release date of the content is in the future, show a countdown timer
+	useEffect(() => {
+		if (!result) return;
+		if (result.release_date) {
+			const releaseDate = new Date(result.release_date);
+			const currentDate = new Date();
+			if (releaseDate > currentDate) {
+				setIsInFuture(true);
+			}
+		}
+	}, [result]);
+
 	const { isOpen, onOpenChange, onOpen } = useDisclosure();
 	const adb = useDisclosure();
 
 	useEffect(() => {
-		if (isLoading) return;
 		DetectAdblock((detected) => {
-			if (detected) {
-			} else {
-				adb.onOpen();
-			}
-		});
-	}, [isLoading]);
-	useEffect(() => {
-		DetectAdblock((detected) => {
+			console.log('Adblock detected:', detected);
 			if (detected) {
 			} else {
 				adb.onOpen();
@@ -106,28 +98,20 @@ const Main = ({ params }: { params: { type: string; id: number } }) => {
 			}
 		}
 
-		const timer = setTimeout(() => {
-			if (result) {
-				ca.add();
-			}
-		}, 30000);
+		const timer = setTimeout(
+			() => {
+				if (result) {
+					ca.add();
+				}
+			},
+			1000 * 60 * 5
+		); // 5 minutes
 		return () => clearTimeout(timer);
 	}, [user, result, value]);
 
 	useEffect(() => {
 		if (!value) return;
 		if (!result) return;
-		if (value.continueWatching && value.continueWatching.length > 0) {
-			// if the id property inside any object in the continueWatching array matches the id of the current result
-			// set isInCW to true
-			if (value.continueWatching.some((item: { id: number }) => item.id === result.id)) {
-				console.log('is in cw');
-				setIsInCW(true);
-			}
-		} else {
-			setIsInCW(false);
-		}
-
 		if (value[result.media_type]) {
 			if (value[result.media_type].includes(result.id)) {
 				setIsInWatchlist(true);
@@ -229,90 +213,45 @@ const Main = ({ params }: { params: { type: string; id: number } }) => {
 		}
 	};
 
-	const editCW = () => {
-		if (!user) onOpen();
-		if (isInCW) {
-			ca.remove();
-		} else {
-			ca.add();
-		}
-	};
-
 	const setLoading = (state: boolean) => {
 		setIsLoading(state);
 	};
+	if (isInFuture) {
+		return (
+			<div className="min-h-screen w-full overflow-hidden bg-background text-foreground dark fc">
+				{result && (
+					<div className="relative h-full w-full fc">
+						<Image
+							src={`https://image.tmdb.org/t/p/original${result?.backdrop_path}`}
+							alt="backdrop"
+							width={1920}
+							height={1080}
+							className="h-screen w-full object-cover object-center absolute"
+						/>
+						<div className="fc absolute bg-background/50 backdrop-blur-2xl border border-foreground/30 p-5 rounded-2xl">
+							<h3 className="text-2xl font-bold text-center">
+								{result && 'title' in result && result.title ? result.title : 'name' in result ? result.name : ''} has not been
+								released yet
+							</h3>
+							{'release_date' in result && result.release_date ? (
+								<h4 className="text-lg text-center">
+									{/* May 5, 2024 format with date-fns */}
+									Set to release on {format(new Date(result.release_date), 'MMMM d, yyyy')}
+								</h4>
+							) : null}
+						</div>
+					</div>
+				)}
+			</div>
+		);
+	}
 
 	return (
 		<>
 			<div className="min-h-screen w-full overflow-hidden bg-background text-foreground dark">
 				{(isLoading || loading) && <Loading />}
-				<Modal isOpen={adb.isOpen} onOpenChange={adb.onOpenChange}>
-					<ModalContent>
-						<>
-							<ModalHeader className="flex flex-col gap-1">Use Ad Blocker</ModalHeader>
-							<ModalBody>
-								<p>
-									It is <b>highly</b> recommended that you use an ad blocker such as{' '}
-									<NLink as={Link} isExternal href="https://github.com/gorhill/uBlock#readme">
-										Ublock Origin
-									</NLink>{' '}
-									while watching videos on WatchWave. There are spammy ads on the video players, which are out of our control and
-									can&apos;t be disabled. Using an ad blocker is an easy solution to get rid of the ads on the video players.
-								</p>
-								<br />
-							</ModalBody>
-							<ModalFooter>
-								<Button
-									onClick={() => {
-										adb.onClose();
-									}}
-									variant="ghost"
-								>
-									Continue without ad blocker
-								</Button>
-								<Link href="https://github.com/gorhill/uBlock#readme">
-									<Button>Download Ublock Origin</Button>
-								</Link>
-							</ModalFooter>
-						</>
-					</ModalContent>
-				</Modal>
-				{result && (
-					<Modal isOpen={isOpen} onOpenChange={onOpenChange}>
-						<ModalContent>
-							{(onClose) => (
-								<>
-									<ModalHeader className="flex flex-col gap-1">Add to Watchlist</ModalHeader>
-									<ModalBody>
-										<p>You must be logged in to perform this action.</p>
-									</ModalBody>
-									<ModalFooter>
-										<Button
-											onClick={() => {
-												onClose();
-											}}
-											variant="ghost"
-										>
-											Cancel
-										</Button>
-										<Button
-											onClick={() => {
-												try {
-													googleSignIn();
-													onClose();
-												} catch (e) {
-													console.log(e);
-												}
-											}}
-										>
-											Login
-										</Button>
-									</ModalFooter>
-								</>
-							)}
-						</ModalContent>
-					</Modal>
-				)}
+				<ModalManager isOpen={adb.isOpen} onClose={adb.onClose} onOpenChange={adb.onOpenChange} type="adBlock" />
+				{result && <ModalManager isOpen={isOpen} onClose={onOpen} onOpenChange={onOpenChange} type="watchlist" data={{ googleSignIn }} />}
 				<div className="w-full overflow-hidden sm:pl-28 md:pl-36 pt-16 sm:pt-8">
 					{type === 'movie' && result && 'title' in result ? (
 						<>
@@ -340,17 +279,6 @@ const Main = ({ params }: { params: { type: string; id: number } }) => {
 										src={sourceCollectionMovie[source]}
 									/>
 									<div className="fr w-full flex-wrap gap-3 pt-2 sm:items-end">
-										<Button size="sm" onClick={editCW}>
-											{isInCW ? (
-												<>
-													Remove from Continue Watching <IoRemove size={20} />
-												</>
-											) : (
-												<>
-													Add to Continue Watching <IoAdd size={20} />
-												</>
-											)}
-										</Button>
 										<Button size="sm" onClick={handleClick}>
 											{isInWatchlist ? (
 												<>
@@ -444,17 +372,6 @@ const Main = ({ params }: { params: { type: string; id: number } }) => {
 											</DropdownMenu>
 										</Dropdown>
 										<div className="fr flex-wrap gap-3">
-											<Button size="sm" onClick={editCW}>
-												{isInCW ? (
-													<>
-														Remove from Continue Watching <IoRemove size={20} />
-													</>
-												) : (
-													<>
-														Add to Continue Watching <IoAdd size={20} />
-													</>
-												)}
-											</Button>
 											<Button size="sm" onClick={handleClick}>
 												{isInWatchlist ? (
 													<>

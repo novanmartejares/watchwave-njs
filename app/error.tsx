@@ -4,7 +4,7 @@ import { Button } from '@nextui-org/react';
 import { useEffect, useState } from 'react';
 
 export default function Error({ error, reset }: { error: Error & { digest?: string }; reset: () => void }) {
-	const [showDetails, setShowDetails] = useState(true);
+	const [showDetails, setShowDetails] = useState(false);
 	useEffect(() => {
 		// Log the error to an error reporting service
 		console.log(error);

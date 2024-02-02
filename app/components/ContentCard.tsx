@@ -2,22 +2,8 @@
 import React, { useEffect, useState } from 'react';
 import { Movie, MovieDetails, Show, ShowDetails, recommendationProps } from '@/types';
 import Image from 'next/image';
-import {
-	Button,
-	Chip,
-	Modal,
-	ModalBody,
-	ModalContent,
-	ModalFooter,
-	ModalHeader,
-	Popover,
-	PopoverContent,
-	PopoverTrigger,
-	Tooltip,
-	useDisclosure,
-} from '@nextui-org/react';
+import { Button, Chip, Popover, PopoverContent, PopoverTrigger, Tooltip, useDisclosure } from '@nextui-org/react';
 import { IoAdd, IoCheckmark, IoClose, IoList } from 'react-icons/io5';
-import { useRouter } from 'next/navigation';
 import useAddToWatchlist from '@/app/lib/firebase/addToWatchlist';
 interface Props {
 	content: Show | Movie | MovieDetails | ShowDetails | recommendationProps;
@@ -28,20 +14,21 @@ import getDocData from '@/app/lib/firebase/getDocData';
 import { UserAuth } from '@/app/context/AuthContext';
 import useAddToContinueWatching from '@/app/lib/firebase/addToContinueWatching';
 import Link from 'next/link';
+import { ModalManager } from '../lib/ModalManager';
+import { getProperTime } from '../lib/mtoH&M';
+import { format } from 'date-fns';
 
 const ContentCard = ({ content, isDragging, removeFromCW }: Props) => {
 	const { user, googleSignIn } = UserAuth();
-	const router = useRouter();
 	const cw = useAddToContinueWatching(content.media_type, content.id);
 	const { add, remove } = useAddToWatchlist(content.media_type, content.id);
 	const [isInWatchlist, setIsInWatchlist] = useState(false);
-	const [isInCW, setIsInCW] = useState(false);
 	const [data, setData] = useState<any>(null);
 	const [popover, setPopover] = useState(false);
 	const [loading, setLoading] = useState(false);
 
 	useEffect(() => {
-		const data = getDocData(user)
+		getDocData(user)
 			.then((res) => {
 				setData(res);
 			})
@@ -55,16 +42,6 @@ const ContentCard = ({ content, isDragging, removeFromCW }: Props) => {
 				setIsInWatchlist(true);
 			} else {
 				setIsInWatchlist(false);
-			}
-		}
-
-		if (data.continueWatching) {
-			if (data.continueWatching[content.media_type]) {
-				if (data.continueWatching[content.media_type].includes(content.id)) {
-					setIsInCW(true);
-				} else {
-					setIsInCW(false);
-				}
 			}
 		}
 	}, [data, user]);
@@ -93,46 +70,10 @@ const ContentCard = ({ content, isDragging, removeFromCW }: Props) => {
 			.catch((err) => console.log(err));
 	};
 
-	const { isOpen, onOpenChange, onOpen } = useDisclosure();
+	const { isOpen, onOpenChange, onOpen, onClose } = useDisclosure();
 	return (
 		<div className={`aspect-[2/3] w-full max-w-[250px] ${isDragging ? 'cursor-grabbing' : 'cursor-pointer'}`}>
-			<Modal isOpen={isOpen} onOpenChange={onOpenChange}>
-				<ModalContent>
-					{(onClose) => (
-						<>
-							<ModalHeader className="flex flex-col gap-1">Add to Watchlist</ModalHeader>
-							<ModalBody>
-								<p>
-									You need to be logged in to add {'title' in content ? content.title : content.name}
-									to watchlist.
-								</p>
-							</ModalBody>
-							<ModalFooter>
-								<Button
-									onClick={() => {
-										onClose();
-									}}
-									variant="ghost"
-								>
-									Cancel
-								</Button>
-								<Button
-									onClick={() => {
-										try {
-											googleSignIn();
-											onClose();
-										} catch (e) {
-											console.log(e);
-										}
-									}}
-								>
-									Login
-								</Button>
-							</ModalFooter>
-						</>
-					)}
-				</ModalContent>
-			</Modal>
+			<ModalManager onClose={onClose} isOpen={isOpen} onOpenChange={onOpenChange} type="watchlist" />
 			<div className="group relative h-full w-full">
 				{content.poster_path ? (
 					<>
@@ -191,7 +132,7 @@ const ContentCard = ({ content, isDragging, removeFromCW }: Props) => {
 									</Button>
 								</Tooltip>
 							)}
-							<Tooltip content="Add to Watchlist">
+							<Tooltip content={isInWatchlist ? 'Remove from Watchlist' : 'Add to Watchlist'}>
 								<Button
 									isIconOnly
 									color="default"
@@ -234,8 +175,8 @@ const ContentCard = ({ content, isDragging, removeFromCW }: Props) => {
 									<div></div>
 								</PopoverTrigger>
 								<PopoverContent onClick={() => setPopover(false)}>
-									{(titleProps) => (
-										<div className="px-1 py-2">
+									{() => (
+										<div className="px-1 py-2 max-w-[300px]">
 											<h3 className="font-bold">
 												{'title' in content ? content.title : content.name} •{' '}
 												{'release_date' in content && content.release_date.length !== 0
@@ -243,8 +184,13 @@ const ContentCard = ({ content, isDragging, removeFromCW }: Props) => {
 													: 'first_air_date' in content && content.first_air_date.length !== 0
 														? content.first_air_date.split('-')[0]
 														: 'N/A'}
+												{'runtime' in content
+													? ` • ${format(new Date(0, 0, 0, 0, content.runtime), "h 'hr' m 'min'")}`
+													: 'number_of_episodes' in content
+														? `• ${content.number_of_episodes} episodes • ${content.number_of_seasons} seasons`
+														: ''}
 											</h3>
-											<p className="max-w-[300px]">{content.overview}</p>
+											<p className="w-full">{content.overview}</p>
 										</div>
 									)}
 								</PopoverContent>

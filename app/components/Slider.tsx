@@ -1,7 +1,7 @@
 'use client';
 import ContentCard from './ContentCard';
 import React, { useEffect, useRef, useState } from 'react';
-import { MovieSection, TvSection } from '../../types';
+import { MovieDetails, MovieSection, ShowDetails, TvSection } from '../../types';
 import { IoIosArrowRoundForward } from 'react-icons/io';
 import { Button } from '@nextui-org/react';
 import { loadMore } from '@/app/lib/loadMore';
@@ -31,7 +31,7 @@ const Slider = ({ section, headline, more, removeFromCW, setIsLoading }: Props) 
 	const [stateCollection, setStateCollection] = useState<MovieSection | TvSection>(section);
 	const [loadMoreIsLoading, setloadMoreisLoading] = useState(false);
 
-	const [cwCollection, setCwCollection] = useState([]);
+	const [cwCollection, setCwCollection] = useState<Array<ShowDetails | MovieDetails> | null>(null);
 
 	const [value, loading, error] = useDocumentData(doc(db, 'users/' + user?.uid));
 
@@ -40,10 +40,11 @@ const Slider = ({ section, headline, more, removeFromCW, setIsLoading }: Props) 
 		if (!value) return;
 		console.log(value);
 		const getCW = async () => {
-			let tempCollection = [];
+			let tempCollection: Array<ShowDetails | MovieDetails> = [];
 
 			// map through the array and fetch the details of each item
-			const promises = value.continueWatching.map(async (item) => {
+			const promises = value.continueWatching.map(async (item: { type: 'movie' | 'tv'; id: number }) => {
+				console.log(item);
 				const res = await fetchDetails(item.id, item.type);
 				return res;
 			});
@@ -53,7 +54,7 @@ const Slider = ({ section, headline, more, removeFromCW, setIsLoading }: Props) 
 			results.map((item, i) => {
 				tempCollection.push(item);
 			});
-
+			console.log(tempCollection);
 			setCwCollection(tempCollection);
 		};
 		getCW();
@@ -61,7 +62,7 @@ const Slider = ({ section, headline, more, removeFromCW, setIsLoading }: Props) 
 
 	return (
 		<>
-			{(removeFromCW ? cwCollection?.length > 0 : stateCollection.collection) && (
+			{(removeFromCW ? cwCollection && cwCollection?.length > 0 : stateCollection.collection) && (
 				<section className="fc w-full items-start gap-5 overflow-hidden">
 					{headline && <h2 className="px-5 text-2xl font-bold text-white sm:text-4xl">{headline}</h2>}
 					<div className="max-w-full overflow-x-hidden">
@@ -81,7 +82,7 @@ const Slider = ({ section, headline, more, removeFromCW, setIsLoading }: Props) 
 							// onTouchEnd={() => setIsDragging(false)}
 						>
 							{removeFromCW
-								? cwCollection?.map((content) => (
+								? cwCollection?.toReversed().map((content) => (
 										<SwiperSlide key={`${content.id} ${content.popularity}`}>
 											<ContentCard removeFromCW={removeFromCW} content={content} />
 										</SwiperSlide>

@@ -16,7 +16,8 @@ interface EpisodeCardProps {
 const EpisodeCard: React.FC<EpisodeCardProps> = ({ episodeSelected, episode, setEpisode, season, id }) => {
 	const { set } = useSetTracker();
 	const swiper = useSwiper();
-
+	const today = new Date();
+	const airDate = new Date(episode.air_date);
 	// if active slide, slideTo
 	useEffect(() => {
 		if (episodeSelected) {
@@ -44,7 +45,9 @@ const EpisodeCard: React.FC<EpisodeCardProps> = ({ episodeSelected, episode, set
 					alt={`Episode ${episode.episode_number} still image`}
 				/>
 			) : (
-				<div className="h-full w-full rounded-md bg-gradient-to-b from-[#0f0f0f] to-[#1f1f1f]"></div>
+				<div className="h-full w-full rounded-md bg-gradient-to-b from-[#0f0f0f] to-[#1f1f1f] fc">
+					{airDate > today ? 'Episode not released' : 'No Image'}
+				</div>
 			)}
 			<div className="fc absolute inset-0 items-start justify-end rounded-md bg-gradient-to-b from-transparent to-black p-2">
 				<h4 className="text-sm font-bold">Episode {episode.episode_number}</h4>

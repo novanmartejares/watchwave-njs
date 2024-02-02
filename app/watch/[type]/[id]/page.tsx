@@ -23,12 +23,11 @@ export async function generateMetadata({ params }: Props): Promise<Metadata> {
 		for (let i = 0; i < keywords.results.length; i++) {
 			keywordsArray.push(keywords.results[i].name);
 		}
-	} else {
+	} else if (keywords.keywords) {
 		for (let i = 0; i < keywords.keywords.length; i++) {
 			keywordsArray.push(keywords.keywords[i].name);
 		}
 	}
-
 	// get image url from
 	const image = content.poster_path || content.poster_path;
 
