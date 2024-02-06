@@ -9,6 +9,7 @@
 		"lint": "next lint"
 	},
 	"dependencies": {
+		"@next/third-parties": "^14.1.0",
 		"@nextui-org/react": "^2.2.9",
 		"@scthakuri/adblock-detector": "^1.0.7",
 		"@vercel/analytics": "^1.1.1",
