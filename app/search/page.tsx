@@ -8,7 +8,8 @@ import { Button, Input, Slider } from '@nextui-org/react';
 import { useRouter, useSearchParams } from 'next/navigation';
 import React, { useEffect, useState } from 'react';
 import { IoSearch } from 'react-icons/io5';
-
+import { doc, getDoc } from 'firebase/firestore';
+import { db } from '../lib/firebase/firebase';
 const Search = () => {
 	const params = useSearchParams();
 	const [fieldQuery, setFieldQuery] = useState<string>('');
@@ -22,12 +23,43 @@ const Search = () => {
 	const clearField = () => {
 		router.push('/search');
 	};
+	useEffect(() => {
+		console.log(filteredData);
+	}, [filteredData]);
 
 	const handleSubmit = (e: React.FormEvent<HTMLFormElement>) => {
 		e.preventDefault();
 		// if fieldQuery is empty, return
 		if (!fieldQuery) return;
 		router.push(`/search?query=${fieldQuery}`);
+	};
+
+	// filter out dmca content
+	const filterDMCA = async (data: SearchResultsProps['results']) => {
+		// collection "dmca", document "dmca", array "notices" inside array are numbers that are the id of the content
+		// if the id of the content is in the array, remove it
+
+		// fetch dmca data
+		const docRef = doc(db, 'dmca', 'dmca');
+		const docSnap = await getDoc(docRef);
+
+		if (docSnap.exists()) {
+			const dmcaData = docSnap.data().notices;
+			// filter out dmca content
+			const filt = data.filter((result: Movie | Show) => {
+				if (result.media_type === 'movie' && 'title' in result) {
+					return !dmcaData.includes(result.id);
+				}
+				if (result.media_type === 'tv' && 'name' in result) {
+					return !dmcaData.includes(result.id);
+				}
+			});
+			return filt;
+		} else {
+			// docSnap.data() will be undefined in this case
+			console.log('No such document!');
+			throw new Error('No such document!');
+		}
 	};
 
 	// fetch data from api
@@ -41,7 +73,9 @@ const Search = () => {
 				data.results = data.results.filter((result: Movie | Show) => result.media_type !== 'person');
 				setIsLoading(false);
 				setSearchData(data);
-				setFilteredData(data.results);
+				filterDMCA(data.results).then((d) => {
+					setFilteredData(d);
+				});
 			});
 	}, [params]);
 
@@ -84,7 +118,9 @@ const Search = () => {
 						);
 					}
 				});
-				setFilteredData([...filteredData, ...filtered]);
+				filterDMCA([...filteredData, ...filtered]).then((d) => {
+					setFilteredData([...d]);
+				});
 			});
 	};
 
@@ -107,7 +143,9 @@ const Search = () => {
 				);
 			}
 		});
-		setFilteredData(filtered);
+		filterDMCA(filtered).then((d) => {
+			setFilteredData(d);
+		});
 
 		// if filtered data's length is less than 20, load more
 		if (filtered.length < 20) {
@@ -176,7 +214,7 @@ const Search = () => {
 									{filteredData?.map((result) => <ContentCard content={result} key={result.id} />)}
 								</div>
 							}
-							{filteredData.length === 0 && <div className="fc w-full">No content found within this year</div>}
+							{filteredData.length === 0 && <div className="fc w-full">No content found</div>}
 							{searchData && searchData.page < searchData.total_pages && (
 								<div className="fc mt-4 w-full">
 									<Button variant="bordered" onClick={loadMore}>
