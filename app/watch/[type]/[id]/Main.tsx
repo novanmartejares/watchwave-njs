@@ -34,23 +34,21 @@ const Main = ({ params }: { params: { type: string; id: number } }) => {
 	const [isInFuture, setIsInFuture] = useState<boolean>(false);
 
 	const sourceCollectionMovie = [
+		`https://vidsrc.me/embed/movie?tmdb=${id}`,
 		`https://vidsrc.to/embed/movie/${id}`,
 		`https://multiembed.mov/directstream.php?video_id=${id}&tmdb=1`,
-		`https://vidsrc.me/embed/movie?tmdb=${id}`,
 		`https://anyembed.xyz/movie/${id}`,
-		`https://2embed.org/e.php?id=${id}`,
 	];
 	const sourceCollectionTV = result &&
 		'name' in result && [
+			`https://vidsrc.me/embed/tv?tmdb=${id}&season=${
+				result?.seasons[0]?.name === 'Specials' ? season : season + 1
+			}&episode=${episode}&color=006FEE`,
 			`https://vidsrc.to/embed/tv/${id}/${result?.seasons[0]?.name === 'Specials' ? season : season + 1}/${episode}`,
 			`https://multiembed.mov/directstream.php?video_id=${id}&tmdb=1&s=${
 				result?.seasons[0]?.name === 'Specials' ? season : season + 1
 			}&e=${episode}`,
 			`https://anyembed.xyz/tv/${id}/${result?.seasons[0]?.name === 'Specials' ? season : season + 1}/${episode}`,
-			`https://2embed.org/series.php?id=${id}/${result?.seasons[0]?.name === 'Specials' ? season : season + 1}/${episode}`,
-			`https://vidsrc.me/embed/tv?tmdb=${id}&season=${
-				result?.seasons[0]?.name === 'Specials' ? season : season + 1
-			}&episode=${episode}&color=006FEE`,
 		];
 
 	const [value, loading, error] = useDocumentData(doc(db, 'users/' + user?.uid));
@@ -62,11 +60,13 @@ const Main = ({ params }: { params: { type: string; id: number } }) => {
 	// if release date of the content is in the future, show a countdown timer
 	useEffect(() => {
 		if (!result) return;
-		if (result.release_date) {
-			const releaseDate = new Date(result.release_date);
-			const currentDate = new Date();
-			if (releaseDate > currentDate) {
-				setIsInFuture(true);
+		if ('release_date' in result) {
+			if (result.release_date) {
+				const releaseDate = new Date(result.release_date);
+				const currentDate = new Date();
+				if (releaseDate > currentDate) {
+					setIsInFuture(true);
+				}
 			}
 		}
 	}, [result]);

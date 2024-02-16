@@ -3,7 +3,7 @@ import { motion } from 'framer-motion';
 import { useEffect, useRef, useState } from 'react';
 
 import Image from 'next/image';
-import { MovieDetails, fetchResults } from '../types';
+import { MovieDetails, ShowDetails, fetchResults } from '../types';
 import { Button, useDisclosure } from '@nextui-org/react';
 import { IoAdd, IoCheckmark, IoPlay } from 'react-icons/io5';
 
@@ -21,18 +21,18 @@ import { ModalManager } from './lib/ModalManager';
 import { format } from 'date-fns';
 
 interface Props {
-	movie: MovieDetails;
+	movie: MovieDetails | ShowDetails;
 	collection: fetchResults;
 }
 
 const Showcase = ({ movie, collection }: Props) => {
 	const imageURL = `https://image.tmdb.org/t/p/original${movie.backdrop_path}`;
-
+	console.log(movie.logo);
 	const router = useRouter();
 	const { user } = UserAuth();
 	const [isInWatchlist, setIsInWatchlist] = useState(false);
 	const [data, setData] = useState<any>(null);
-	const [isLoading, setIsLoading] = useState(true);
+	const [isLoading, setIsLoading] = useState(false);
 	const { isOpen, onOpenChange, onOpen, onClose } = useDisclosure();
 	const { add, remove } = useAddToWatchlist('movie', movie.id);
 	const [cW, setCW] = useState(null);
@@ -173,6 +173,9 @@ const Showcase = ({ movie, collection }: Props) => {
 	return (
 		<>
 			{isLoading && <Animation />}
+			{/* <iframe className="w-screen h-screen" src="https://d.daddylivehd.sx/embed/stream-1.php">
+				Your Browser Do not Support Iframe
+			</iframe> */}
 			<ModalManager isOpen={isOpen} onOpenChange={onOpenChange} onClose={onClose} type="watchlist" />
 			<main className="min-h-screen w-full overflow-hidden bg-black light">
 				<div className="fc w-screen justify-start">
@@ -199,9 +202,15 @@ const Showcase = ({ movie, collection }: Props) => {
 					<div className="fc mb-10 h-full w-full items-start justify-start">
 						<div className="fc z-10 w-full items-start justify-start pt-80 sm:px-0 sm:pl-36">
 							<div className="fc items-start justify-start px-5 pr-10">
-								<h1 ref={textRef} className="mb-3 pr-10 text-5xl font-bold text-white md:mb-5 md:text-8xl">
-									{movie.title}
-								</h1>
+								{movie.logo ? (
+									<div className="w-full lg:w-1/3 px-3">
+										<Image src={movie.logo} alt="movie logo" width={300} height={200} className="w-full lg:w-auto mb-5" />
+									</div>
+								) : (
+									<h1 ref={textRef} className="mb-3 pr-10 text-5xl font-bold text-white md:mb-5 md:text-8xl">
+										{movie.title}
+									</h1>
+								)}
 
 								{/* details */}
 								<ul className="showcase_detail fr gap-3 text-lg font-medium text-white/80 md:mt-1">
@@ -228,6 +237,12 @@ const Showcase = ({ movie, collection }: Props) => {
 											{/* minutes to minutes and hours with date-fns */}
 											{format(new Date(0, 0, 0, 0, movie.runtime), "h 'hr' m 'min'")}
 										</li>
+									)}
+									{movie.number_of_episodes && (
+										<>
+											<li>•</li>
+											<li>{movie.number_of_episodes} episodes</li>
+										</>
 									)}
 								</ul>
 

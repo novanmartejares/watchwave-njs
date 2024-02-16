@@ -47,6 +47,7 @@ export interface SpokenLanguage {
 }
 
 export interface MovieDetails {
+	logo: string;
 	adult: boolean;
 	backdrop_path: string;
 	belongs_to_collection: Collection;
@@ -166,6 +167,7 @@ export interface SpokenLanguage {
 }
 
 export interface ShowDetails {
+	logo: string;
 	media_type: string;
 	adult: boolean;
 	backdrop_path: string;

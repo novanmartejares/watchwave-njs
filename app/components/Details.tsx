@@ -43,9 +43,6 @@ async function fetchDetails(id: number, type: string) {
 
 	// console.log(credits);
 
-	const keywords = await fetch(`https://api.themoviedb.org/3/${type}/${id}/keywords?language=en-US`, options);
-	let keyw = await keywords.json();
-
 	const videos = await fetch(`https://api.themoviedb.org/3/${type}/${id}/videos?language=en-US`, options);
 	let vid = await videos.json();
 	const reviews = await fetch(`https://api.themoviedb.org/3/${type}/${id}/reviews?language=en-US&page=1`, options);
@@ -53,6 +50,8 @@ async function fetchDetails(id: number, type: string) {
 
 	const external = await fetch(`https://api.themoviedb.org/3/${type}/${id}/external_ids?language=en-US`, options);
 	let ext = await external.json();
+	const keywords = await fetch(`https://api.themoviedb.org/3/${type}/${id}/keywords?language=en-US`, options);
+	let keyw = await keywords.json();
 
 	return {
 		recommendations: recc,
