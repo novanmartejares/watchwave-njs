@@ -10,6 +10,7 @@ import React, { useEffect, useState } from 'react';
 import { IoSearch } from 'react-icons/io5';
 import { doc, getDoc } from 'firebase/firestore';
 import { db } from '../lib/firebase/firebase';
+import { fetchDMCA } from '../lib/fetchDMCA';
 const Search = () => {
 	const params = useSearchParams();
 	const [fieldQuery, setFieldQuery] = useState<string>('');
@@ -35,31 +36,23 @@ const Search = () => {
 	};
 
 	// filter out dmca content
-	const filterDMCA = async (data: SearchResultsProps['results']) => {
+	const filterDMCA = async () => {
 		// collection "dmca", document "dmca", array "notices" inside array are numbers that are the id of the content
 		// if the id of the content is in the array, remove it
 
 		// fetch dmca data
-		const docRef = doc(db, 'dmca', 'dmca');
-		const docSnap = await getDoc(docRef);
-
-		if (docSnap.exists()) {
-			const dmcaData = docSnap.data().notices;
+		fetchDMCA().then((data) => {
 			// filter out dmca content
 			const filt = data.filter((result: Movie | Show) => {
 				if (result.media_type === 'movie' && 'title' in result) {
-					return !dmcaData.includes(result.id);
+					return !data.includes(result.id);
 				}
 				if (result.media_type === 'tv' && 'name' in result) {
-					return !dmcaData.includes(result.id);
+					return !data.includes(result.id);
 				}
 			});
 			return filt;
-		} else {
-			// docSnap.data() will be undefined in this case
-			console.log('No such document!');
-			throw new Error('No such document!');
-		}
+		});
 	};
 
 	// fetch data from api

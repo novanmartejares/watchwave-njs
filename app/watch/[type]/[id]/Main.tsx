@@ -21,6 +21,7 @@ import { db } from '@/app/lib/firebase/firebase';
 import { useDocumentData } from 'react-firebase-hooks/firestore';
 import { ModalManager } from '@/app/lib/ModalManager';
 import { format } from 'date-fns';
+import { fetchDMCA } from '@/app/lib/fetchDMCA';
 
 const Main = ({ params }: { params: { type: string; id: number } }) => {
 	const { id, type } = params;
@@ -32,6 +33,7 @@ const Main = ({ params }: { params: { type: string; id: number } }) => {
 	const { user, googleSignIn } = UserAuth();
 	const [isLoading, setIsLoading] = useState<boolean>(true);
 	const [isInFuture, setIsInFuture] = useState<boolean>(false);
+	const [isinDMCA, setIsInDMCA] = useState<boolean>(false);
 
 	const sourceCollectionMovie = [
 		`https://vidsrc.me/embed/movie?tmdb=${id}`,
@@ -51,7 +53,7 @@ const Main = ({ params }: { params: { type: string; id: number } }) => {
 			`https://anyembed.xyz/tv/${id}/${result?.seasons[0]?.name === 'Specials' ? season : season + 1}/${episode}`,
 		];
 
-	const [value, loading, error] = useDocumentData(doc(db, 'users/' + user?.uid));
+	const [value, loading] = useDocumentData(doc(db, 'users/' + user?.uid));
 
 	const { add, remove } = useAddToWatchlist(result?.media_type, result?.id);
 	const ca = useAddToContinueWatching(result?.media_type, result?.id);
@@ -69,6 +71,12 @@ const Main = ({ params }: { params: { type: string; id: number } }) => {
 				}
 			}
 		}
+
+		fetchDMCA().then((data) => {
+			if (data.includes(result.id)) {
+				setIsInDMCA(true);
+			}
+		});
 	}, [result]);
 
 	const { isOpen, onOpenChange, onOpen } = useDisclosure();
@@ -216,7 +224,8 @@ const Main = ({ params }: { params: { type: string; id: number } }) => {
 	const setLoading = (state: boolean) => {
 		setIsLoading(state);
 	};
-	if (isInFuture) {
+
+	if (isInFuture || isinDMCA) {
 		return (
 			<div className="min-h-screen w-full overflow-hidden bg-background text-foreground dark fc">
 				{result && (
@@ -229,16 +238,26 @@ const Main = ({ params }: { params: { type: string; id: number } }) => {
 							className="h-screen w-full object-cover object-center absolute"
 						/>
 						<div className="fc absolute bg-background/50 backdrop-blur-2xl border border-foreground/30 p-5 rounded-2xl">
-							<h3 className="text-2xl font-bold text-center">
-								{result && 'title' in result && result.title ? result.title : 'name' in result ? result.name : ''} has not been
-								released yet
-							</h3>
-							{'release_date' in result && result.release_date ? (
-								<h4 className="text-lg text-center">
-									{/* May 5, 2024 format with date-fns */}
-									Set to release on {format(new Date(result.release_date), 'MMMM d, yyyy')}
-								</h4>
-							) : null}
+							{isInFuture && (
+								<>
+									<h3 className="text-2xl font-bold text-center">
+										{result && 'title' in result && result.title ? result.title : 'name' in result ? result.name : ''} has not
+										been released yet
+									</h3>
+									{'release_date' in result && result.release_date ? (
+										<h4 className="text-lg text-center">
+											{/* May 5, 2024 format with date-fns */}
+											Set to release on {format(new Date(result.release_date), 'MMMM d, yyyy')}
+										</h4>
+									) : null}
+								</>
+							)}
+							{isinDMCA && (
+								<h3 className="text-2xl font-bold text-center">
+									{result && 'title' in result && result.title ? result.title : 'name' in result ? result.name : ''} has been
+									removed due to DMCA
+								</h3>
+							)}
 						</div>
 					</div>
 				)}
