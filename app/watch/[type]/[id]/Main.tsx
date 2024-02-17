@@ -38,6 +38,7 @@ const Main = ({ params }: { params: { type: string; id: number } }) => {
 	const sourceCollectionMovie = [
 		`https://vidsrc.to/embed/movie/${id}`,
 		`https://vidsrc.me/embed/movie?tmdb=${id}`,
+		`https://embed.smashystream.com/playere.php?tmdb=${id}`,
 		`https://multiembed.mov/directstream.php?video_id=${id}&tmdb=1`,
 		`https://anyembed.xyz/movie/${id}`,
 	];
@@ -47,6 +48,9 @@ const Main = ({ params }: { params: { type: string; id: number } }) => {
 			`https://vidsrc.me/embed/tv?tmdb=${id}&season=${
 				result?.seasons[0]?.name === 'Specials' ? season : season + 1
 			}&episode=${episode}&color=006FEE`,
+			`https://embed.smashystream.com/playere.php?tmdb=${id}&season=${
+				result?.seasons[0]?.name === 'Specials' ? season : season + 1
+			}&episode=${episode}`,
 			`https://multiembed.mov/directstream.php?video_id=${id}&tmdb=1&s=${
 				result?.seasons[0]?.name === 'Specials' ? season : season + 1
 			}&e=${episode}`,
