@@ -1,7 +1,7 @@
 'use client';
 import React, { Fragment } from 'react';
 import { IoHome, IoSearch, IoListOutline } from 'react-icons/io5';
-import { usePathname } from 'next/navigation';
+import { usePathname, useRouter } from 'next/navigation';
 import Link from 'next/link';
 import { Button, Dropdown, DropdownItem, DropdownMenu, DropdownTrigger, Tooltip } from '@nextui-org/react';
 import Image from 'next/image';
@@ -10,6 +10,7 @@ import { UserAuth } from '@/app/context/AuthContext';
 const Navbar = () => {
 	const { user, googleSignIn, logOut } = UserAuth();
 	const pathname = usePathname();
+	const router = useRouter();
 	const icons = [
 		{
 			path: '/',
@@ -94,7 +95,15 @@ const Navbar = () => {
 											{/* <DropdownItem key="account">
                         Account Settings
                       </DropdownItem> */}
-											<DropdownItem key="delete" className="text-danger" color="danger" onClick={logOut}>
+											<DropdownItem
+												key="delete"
+												className="text-danger"
+												color="danger"
+												onClick={() => {
+													logOut();
+													router.refresh();
+												}}
+											>
 												Log Out
 											</DropdownItem>
 										</DropdownMenu>

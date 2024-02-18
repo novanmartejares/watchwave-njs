@@ -1,4 +1,5 @@
 'use client';
+import { LuLoader } from 'react-icons/lu';
 import ContentCard from './ContentCard';
 import React, { useEffect, useRef, useState } from 'react';
 import { MovieDetails, MovieSection, ShowDetails, TvSection } from '../../types';
@@ -107,7 +108,9 @@ const Slider = ({ section, headline, more, removeFromCW, setIsLoading }: Props) 
 											className="py-2 text-white transition-colors hover:text-black"
 										>
 											{loadMoreIsLoading ? (
-												'Loading...'
+												<>
+													<LuLoader className="animate-spinner-linear-spin" /> <span>Loading...</span>
+												</>
 											) : (
 												<>
 													Load More <IoIosArrowRoundForward size={30} />

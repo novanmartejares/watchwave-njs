@@ -213,7 +213,7 @@ const Showcase = ({ movie, collection }: Props) => {
 								)}
 
 								{/* details */}
-								<ul className="showcase_detail fr gap-3 text-lg font-medium text-white/80 md:mt-1">
+								<ul className="showcase_detail fr gap-3 sm:text-lg font-medium text-white/80 md:mt-1">
 									{movie.vote_average !== 0 && (
 										<>
 											<li>{movie.vote_average.toFixed(1)}</li>

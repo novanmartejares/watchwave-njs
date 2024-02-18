@@ -15,11 +15,10 @@ import { UserAuth } from '@/app/context/AuthContext';
 import useAddToContinueWatching from '@/app/lib/firebase/addToContinueWatching';
 import Link from 'next/link';
 import { ModalManager } from '../lib/ModalManager';
-import { getProperTime } from '../lib/mtoH&M';
 import { format } from 'date-fns';
 
 const ContentCard = ({ content, isDragging, removeFromCW }: Props) => {
-	const { user, googleSignIn } = UserAuth();
+	const { user } = UserAuth();
 	const cw = useAddToContinueWatching(content.media_type, content.id);
 	const { add, remove } = useAddToWatchlist(content.media_type, content.id);
 	const [isInWatchlist, setIsInWatchlist] = useState(false);
@@ -88,7 +87,7 @@ const ContentCard = ({ content, isDragging, removeFromCW }: Props) => {
 								width={400}
 								draggable={false}
 								height={600}
-								src={`https://image.tmdb.org/t/p/original${content.poster_path}`}
+								src={`https://image.tmdb.org/t/p/w400${content.poster_path}`}
 								alt={'title' in content ? content.title : content.name}
 								className="absolute h-full w-full rounded-xl object-cover"
 							/>

@@ -25,7 +25,7 @@ const Search = () => {
 		router.push('/search');
 	};
 	useEffect(() => {
-		console.log(filteredData);
+		// console.log(filteredData);
 	}, [filteredData]);
 
 	const handleSubmit = (e: React.FormEvent<HTMLFormElement>) => {
@@ -36,23 +36,19 @@ const Search = () => {
 	};
 
 	// filter out dmca content
-	const filterDMCA = async () => {
+	const filterDMCA = async (d) => {
 		// collection "dmca", document "dmca", array "notices" inside array are numbers that are the id of the content
 		// if the id of the content is in the array, remove it
-
 		// fetch dmca data
-		fetchDMCA().then((data) => {
-			// filter out dmca content
-			const filt = data.filter((result: Movie | Show) => {
-				if (result.media_type === 'movie' && 'title' in result) {
-					return !data.includes(result.id);
-				}
-				if (result.media_type === 'tv' && 'name' in result) {
-					return !data.includes(result.id);
-				}
-			});
-			return filt;
+		let dmca = await fetchDMCA();
+		// console.log(dmca);
+		const filtered = d.filter((result: Movie | Show) => {
+			if (!dmca.includes(result.id)) {
+				return result;
+			}
 		});
+		// console.log(filtered);
+		return filtered;
 	};
 
 	// fetch data from api
@@ -149,7 +145,7 @@ const Search = () => {
 	// if (isLoading) return <Loading />;
 
 	return (
-		<div className="min-h-screen w-full overflow-hidden bg-background px-5 text-foreground dark">
+		<div className="min-h-screen w-full overflow-hidden bg-background px-5 text-foreground dark pb-10">
 			<div className="w-full pt-20 sm:pl-36">
 				<div className="fc h-full w-full gap-3">
 					<form className="fc w-full gap-2" onSubmit={handleSubmit}>
@@ -201,12 +197,17 @@ const Search = () => {
 					</form>
 					<p className="text-lg font-bold text-gray-500">Enter exact title to search</p>
 					{searchData && filteredData && (
-						<div className="mt-10 w-full">
-							{
-								<div className="grid grid-cols-2 place-items-center gap-4 sm:grid-cols-3 md:grid-cols-5">
-									{filteredData?.map((result) => <ContentCard content={result} key={result.id} />)}
-								</div>
-							}
+						<div className="mt-10 w-full relative">
+							{isLoading && (
+								<div
+									className={`absolute inset-0 ${
+										isLoading ? 'blur-2xl bg-black/20 pointer-events-auto' : 'blur-0 bg-transparent pointer-events-none'
+									} transition-[filter,background-color]`}
+								></div>
+							)}
+							<div className="grid grid-cols-2 place-items-center gap-4 sm:grid-cols-3 md:grid-cols-5">
+								{filteredData?.map((result) => <ContentCard content={result} key={result.id} />)}
+							</div>
 							{filteredData.length === 0 && <div className="fc w-full">No content found</div>}
 							{searchData && searchData.page < searchData.total_pages && (
 								<div className="fc mt-4 w-full">
