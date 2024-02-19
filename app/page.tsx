@@ -243,6 +243,8 @@ export default async function Home() {
 	} else {
 		showcased = data.trending_tv.collection[Math.floor(Math.random() * 6)];
 	}
+
+	console.log('showcased', showcased);
 	// fetch with fetchDetails()
 
 	const res = await fetchDetails(showcased.id, showcased.media_type);

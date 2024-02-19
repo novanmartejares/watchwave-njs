@@ -19,6 +19,7 @@ import { doc, getDoc, setDoc } from 'firebase/firestore';
 import { db } from './lib/firebase/firebase';
 import { ModalManager } from './lib/ModalManager';
 import { format } from 'date-fns';
+import Link from 'next/link';
 
 interface Props {
 	movie: MovieDetails | ShowDetails;
@@ -248,15 +249,15 @@ const Showcase = ({ movie, collection }: Props) => {
 
 								<p className="mt-4 max-w-[50ch] text-base font-medium leading-normal text-white/80">{movie.overview}</p>
 								<div className="fr mt-4 gap-3">
-									<Button
-										size="lg"
-										radius="sm"
-										className="group h-11 font-semibold"
-										onClick={() => router.push(`/watch/movie/${movie.id}`)}
-									>
-										<IoPlay size={20} className="text-sm transition-transform duration-500 group-hover:scale-110 sm:text-base" />
-										Play
-									</Button>
+									<Link href={`/watch/${movie.media_type}/${movie.id}`}>
+										<Button size="lg" radius="sm" className="group h-11 font-semibold">
+											<IoPlay
+												size={20}
+												className="text-sm transition-transform duration-500 group-hover:scale-110 sm:text-base"
+											/>
+											Play
+										</Button>
+									</Link>
 									<Button
 										size="lg"
 										radius="sm"
