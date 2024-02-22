@@ -1,7 +1,27 @@
-.swiper-wrapper {
+/* .swiper-wrapper {
 	@apply py-4;
 }
+
+.swiper-scrollbar {
+	@apply mt-1 bg-foreground-800;
+}
+
+.swiper-slide {
+	@apply aspect-none;
+}
+
 .swiper-horizontal > .swiper-scrollbar,
 .swiper-scrollbar.swiper-scrollbar-horizontal {
-	@apply h-1 w-full;
+	@apply h-1 w-full light;
+}
+.swiper-scrollbar-drag {
+	@apply bg-foreground-300;
+} */
+
+.swiper-horizontal > .swiper-scrollbar,
+.swiper-scrollbar.swiper-scrollbar-horizontal {
+  @apply w-full;
+}
+.swiper-wrapper {
+  @apply py-4;
 }

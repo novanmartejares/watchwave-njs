@@ -1,228 +1,148 @@
-'use client';
-import Loading from '@/app/loading';
-import ContentCard from '@/app/components/ContentCard';
-import Footer from '@/app/components/Footer';
-import options from '@/app/lib/options';
-import { Movie, SearchResultsProps, Show } from '@/types';
-import { Button, Input, Slider } from '@nextui-org/react';
-import { useRouter, useSearchParams } from 'next/navigation';
-import React, { useEffect, useState } from 'react';
-import { IoSearch } from 'react-icons/io5';
-import { doc, getDoc } from 'firebase/firestore';
-import { db } from '../lib/firebase/firebase';
-import { fetchDMCA } from '../lib/fetchDMCA';
-const Search = () => {
-	const params = useSearchParams();
-	const [fieldQuery, setFieldQuery] = useState<string>('');
-	const [isLoading, setIsLoading] = useState(true);
-	const [searchData, setSearchData] = useState<SearchResultsProps | null>(null);
-	const [year, setYear] = useState<number[]>([1900, new Date().getFullYear()]);
-	const [filteredData, setFilteredData] = useState<(Movie | Show)[]>([]);
+"use client";
+import { useState, useCallback, useEffect } from "react";
+import { debounce } from "lodash";
+import options from "@/app/lib/options";
+import { Movie, Show } from "@/types";
+import { Input } from "@nextui-org/react";
+import { IoSearch } from "react-icons/io5";
+import { fetchDMCA } from "../lib/fetchDMCA";
+import SearchResults from "./SearchResults";
 
-	const router = useRouter();
+const Search: React.FC = () => {
+  const [fieldQuery, setFieldQuery] = useState("");
+  const [isLoading, setIsLoading] = useState(false);
+  const [filteredData, setFilteredData] = useState([]);
+  const [allData, setAllData] = useState([]);
+  const [page, setPage] = useState(1);
+  const [totalPages, setTotalPages] = useState(null);
 
-	const clearField = () => {
-		router.push('/search');
-	};
-	useEffect(() => {
-		// console.log(filteredData);
-	}, [filteredData]);
+  const filterDMCA = async (d) => {
+    // collection "dmca", document "dmca", array "notices" inside array are numbers that are the id of the content
+    // if the id of the content is in the array, remove it
+    // fetch dmca data
+    let dmca = await fetchDMCA();
+    // console.log(dmca);
+    const filtered = d.filter((result: Movie | Show) => {
+      if (!dmca.includes(result.id)) {
+        return result;
+      }
+    });
+    console.log(filtered);
+    return filtered;
+  };
 
-	const handleSubmit = (e: React.FormEvent<HTMLFormElement>) => {
-		e.preventDefault();
-		// if fieldQuery is empty, return
-		if (!fieldQuery) return;
-		router.push(`/search?query=${fieldQuery}`);
-	};
+  useEffect(() => {
+    if (fieldQuery === "") {
+      setFilteredData([]);
+      setIsLoading(false);
+      setPage(1);
+    }
+  }, [fieldQuery]);
 
-	// filter out dmca content
-	const filterDMCA = async (d) => {
-		// collection "dmca", document "dmca", array "notices" inside array are numbers that are the id of the content
-		// if the id of the content is in the array, remove it
-		// fetch dmca data
-		let dmca = await fetchDMCA();
-		// console.log(dmca);
-		const filtered = d.filter((result: Movie | Show) => {
-			if (!dmca.includes(result.id)) {
-				return result;
-			}
-		});
-		// console.log(filtered);
-		return filtered;
-	};
+  // useEffect(() => {
+  // 	console.log(fieldQuery);
+  // }, [fieldQuery]);
 
-	// fetch data from api
-	useEffect(() => {
-		const query = params.get('query');
-		if (!query) return;
-		fetch(`https://api.themoviedb.org/3/search/multi?query=${query}&include_adult=false&language=en-US&page=1`, options)
-			.then((res) => res.json())
-			.then((data) => {
-				// remove people
-				data.results = data.results.filter((result: Movie | Show) => result.media_type !== 'person');
-				setIsLoading(false);
-				setSearchData(data);
-				filterDMCA(data.results).then((d) => {
-					setFilteredData(d);
-				});
-			});
-	}, [params]);
+  const debouncedSearch = useCallback(
+    debounce((query: string) => {
+      if (!query) return;
+      console.log(query, "searching...");
+      setIsLoading(true);
+      fetch(
+        `https://api.themoviedb.org/3/search/multi?query=${query}&include_adult=false&language=en-US&page=${page}`,
+        options,
+      )
+        .then((res) => res.json())
+        .then((data) => {
+          setTotalPages(data.total_pages);
+          setAllData(data);
+          data.results = data.results.filter(
+            (result: Movie | Show) => result.media_type !== "person",
+          );
+          setIsLoading(false);
+          console.log(data.results);
+          filterDMCA(data.results).then((d) => {
+            setFilteredData(() => [...d]);
+          });
+        });
+      setPage(1);
+    }, 800),
+    [fieldQuery, page],
+  );
 
-	const loadMore = () => {
-		// console.log(
-		//   "%c Loading More...",
-		//   "background: #222; color: #bada55; font-size: 25px; font-weight: bold;",
-		// );
-		if (!searchData) return;
-		const query = params.get('query');
-		fetch(
-			`https://api.themoviedb.org/3/search/multi?query=${query}&include_adult=false&language=en-US&page=${
-				searchData.page + 1
-			}&sort_by=popularity.desc`,
-			options
-		)
-			.then((res) => res.json())
-			.then((data) => {
-				// remove people
-				data.results = data.results.filter((result: Movie | Show) => result.media_type !== 'person');
-				setIsLoading(false);
-				setSearchData({
-					...data,
-					results: [...searchData.results, ...data.results],
-				});
-				// filter out tv shows and movies BOT
-				const filtered = data.results.filter((result: Movie | Show) => {
-					if (result.media_type === 'movie' && 'title' in result) {
-						return (
-							result.release_date &&
-							new Date(result.release_date).getFullYear() >= year[0] &&
-							new Date(result.release_date).getFullYear() <= year[1]
-						);
-					}
-					if (result.media_type === 'tv' && 'name' in result) {
-						return (
-							result.first_air_date &&
-							new Date(result.first_air_date).getFullYear() >= year[0] &&
-							new Date(result.first_air_date).getFullYear() <= year[1]
-						);
-					}
-				});
-				filterDMCA([...filteredData, ...filtered]).then((d) => {
-					setFilteredData([...d]);
-				});
-			});
-	};
+  const setCurrentPage = (page: number) => {
+    console.log("setting page...", page);
+    setPage(page);
+  };
 
-	// when year is changed, filter filteredData
-	useEffect(() => {
-		if (!searchData) return;
-		const filtered: (Movie | Show)[] = searchData.results.filter((result: Movie | Show) => {
-			if (result.media_type === 'movie' && 'title' in result) {
-				return (
-					result.release_date &&
-					new Date(result.release_date).getFullYear() >= year[0] &&
-					new Date(result.release_date).getFullYear() <= year[1]
-				);
-			}
-			if (result.media_type === 'tv' && 'name' in result) {
-				return (
-					result.first_air_date &&
-					new Date(result.first_air_date).getFullYear() >= year[0] &&
-					new Date(result.first_air_date).getFullYear() <= year[1]
-				);
-			}
-		});
-		filterDMCA(filtered).then((d) => {
-			setFilteredData(d);
-		});
+  useEffect(() => {
+    setIsLoading(true);
+    fetch(
+      `https://api.themoviedb.org/3/search/multi?query=${fieldQuery}&include_adult=false&language=en-US&page=${page}`,
+      options,
+    )
+      .then((res) => res.json())
+      .then((data) => {
+        data.results = data.results.filter(
+          (result: Movie | Show) => result.media_type !== "person",
+        );
+        setIsLoading(false);
+        setAllData(data);
+        filterDMCA(data.results).then((d) => {
+          setFilteredData([...d]);
+        });
+      });
+  }, [page]);
 
-		// if filtered data's length is less than 20, load more
-		if (filtered.length < 20) {
-			loadMore();
-		}
-	}, [year]);
+  const handleInputChange = (e: React.ChangeEvent<HTMLInputElement>) => {
+    const query = e.target.value;
+    setFieldQuery(query);
+    debouncedSearch(query);
+  };
 
-	// if (isLoading) return <Loading />;
-
-	return (
-		<div className="min-h-screen w-full overflow-hidden bg-background px-5 text-foreground dark pb-10">
-			<div className="w-full pt-20 sm:pl-36">
-				<div className="fc h-full w-full gap-3">
-					<form className="fc w-full gap-2" onSubmit={handleSubmit}>
-						<div className="fc sm:fr w-full gap-2">
-							<Input
-								value={fieldQuery}
-								onChange={(e) => setFieldQuery(e.target.value)}
-								startContent={<IoSearch className="text-foreground-500" size={20} />}
-								placeholder="Search"
-								variant="bordered"
-								classNames={{
-									base: 'w-full max-w-[500px]',
-									inputWrapper: 'h-12',
-									input: 'text-xl',
-								}}
-							/>
-							<div className="fr w-full gap-2 sm:w-auto">
-								<Button variant="bordered" className="h-12 w-full sm:w-auto" onClick={clearField}>
-									Clear
-								</Button>
-								<Button className="h-12 w-full sm:w-auto" type="submit">
-									Search
-								</Button>
-							</div>
-						</div>
-						{searchData && filteredData && (
-							<Slider
-								onChange={(a) => {
-									// if a is number array
-									if (typeof a === 'number') {
-										setYear([a, a]);
-									} else {
-										setYear(a);
-									}
-								}}
-								label="Year Range"
-								step={1}
-								minValue={1900}
-								maxValue={new Date().getFullYear()}
-								defaultValue={year}
-								color="foreground"
-								formatOptions={{
-									style: 'decimal',
-									useGrouping: false,
-								}}
-								className="w-full max-w-[500px]"
-							/>
-						)}
-					</form>
-					<p className="text-lg font-bold text-gray-500">Enter exact title to search</p>
-					{searchData && filteredData && (
-						<div className="mt-10 w-full relative">
-							{isLoading && (
-								<div
-									className={`absolute inset-0 ${
-										isLoading ? 'blur-2xl bg-black/20 pointer-events-auto' : 'blur-0 bg-transparent pointer-events-none'
-									} transition-[filter,background-color]`}
-								></div>
-							)}
-							<div className="grid grid-cols-2 place-items-center gap-4 sm:grid-cols-3 md:grid-cols-5">
-								{filteredData?.map((result) => <ContentCard content={result} key={result.id} />)}
-							</div>
-							{filteredData.length === 0 && <div className="fc w-full">No content found</div>}
-							{searchData && searchData.page < searchData.total_pages && (
-								<div className="fc mt-4 w-full">
-									<Button variant="bordered" onClick={loadMore}>
-										Load More
-									</Button>
-								</div>
-							)}
-						</div>
-					)}
-				</div>
-			</div>
-			{searchData && filteredData && <Footer />}
-		</div>
-	);
+  return (
+    <div className="relative min-h-screen w-full bg-neutral-950">
+      <div className="absolute h-full w-full overflow-hidden">
+        <div className="dark:bg-grid-white/[0.1] bg-grid-black/[0.1] relative flex h-full w-full items-center justify-center">
+          {/* Radial gradient for the container to give a faded look */}
+          <div className="pointer-events-none absolute inset-0  h-1/3 bg-gradient-to-b from-zinc-950 to-transparent"></div>
+        </div>
+      </div>
+      <div className="fc mx-auto max-w-6xl justify-start px-3 pt-24 antialiased sm:px-10 sm:pl-36">
+        <h1 className="z-10 bg-gradient-to-br from-slate-300 to-slate-500 bg-clip-text py-4 text-center text-5xl font-medium tracking-tight text-transparent md:text-7xl">
+          Search
+        </h1>
+        <div className="fc w-full gap-2">
+          <Input
+            autoComplete="off"
+            value={fieldQuery}
+            onChange={handleInputChange}
+            startContent={
+              <IoSearch className="text-foreground-500" size={20} />
+            }
+            placeholder="Enter title to search"
+            variant="flat"
+            classNames={{
+              base: "w-full max-w-[500px]",
+              inputWrapper: "h-12",
+              input: "text-base sm:text-xl",
+            }}
+          />
+          <p className="text-sm font-semibold text-zinc-400">
+            Enter exact title to search
+          </p>
+        </div>
+        <SearchResults
+          isLoading={isLoading}
+          filteredData={filteredData}
+          query={fieldQuery}
+          totalPages={totalPages || 1}
+          setPage={setCurrentPage}
+          allData={allData}
+        />
+      </div>
+    </div>
+  );
 };
 
 export default Search;

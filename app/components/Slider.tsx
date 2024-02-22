@@ -23,6 +23,7 @@ interface Props {
 }
 import 'swiper/css/free-mode';
 import { IoArrowBack, IoArrowForward } from 'react-icons/io5';
+import NewCard from './NewCard';
 
 const Slider = ({ section, headline, more, removeFromCW, setIsLoading }: Props) => {
 	const prev = useRef<HTMLButtonElement>(null);
@@ -61,79 +62,77 @@ const Slider = ({ section, headline, more, removeFromCW, setIsLoading }: Props) 
 		getCW();
 	}, [value]);
 
-	return (
-		<>
-			{(removeFromCW ? cwCollection && cwCollection?.length > 0 : stateCollection.collection) && (
-				<section className="fc w-full items-start gap-5 overflow-hidden">
-					{headline && <h2 className="px-5 text-2xl font-bold text-white sm:text-4xl">{headline}</h2>}
-					<div className="max-w-full overflow-x-hidden">
-						<Swiper
-							modules={[Scrollbar, Navigation]}
-							// freeMode={true}
-							navigation={{
-								nextEl: next.current,
-								prevEl: prev.current,
-								hideOnClick: true,
-							}}
-							scrollbar={{ draggable: true, hide: false, enabled: true }}
-							spaceBetween={10}
-							slidesPerView={'auto'}
-							onInit={() => setIsLoading && setIsLoading(false)}
-							// onTouchStart={() => setIsDragging(true)}
-							// onTouchEnd={() => setIsDragging(false)}
-						>
-							{removeFromCW
-								? cwCollection?.toReversed().map((content) => (
-										<SwiperSlide key={`${content.id} ${content.popularity}`}>
-											<ContentCard removeFromCW={removeFromCW} content={content} />
-										</SwiperSlide>
-									))
-								: stateCollection.collection.map((content) => (
-										<SwiperSlide key={`${content.id} ${content.popularity}`}>
-											<ContentCard removeFromCW={removeFromCW} content={content} />
-										</SwiperSlide>
-									))}
-							{more === false ? null : (
-								<SwiperSlide>
-									<div className="fr aspect-[2/3] min-w-[200px] cursor-pointer gap-3 rounded-lg pr-5 text-white">
-										<Button
-											// use load more function to take the prev statecollection and in the collection key of that object append the output from loadMore
-											onClick={async () => {
-												setloadMoreisLoading(true);
-												const updatedCollection = await loadMore(stateCollection);
-												setStateCollection(updatedCollection);
-												setloadMoreisLoading(false);
-											}}
-											variant="ghost"
-											className="py-2 text-white transition-colors hover:text-black"
-										>
-											{loadMoreIsLoading ? (
-												<>
-													<LuLoader className="animate-spinner-linear-spin" /> <span>Loading...</span>
-												</>
-											) : (
-												<>
-													Load More <IoIosArrowRoundForward size={30} />
-												</>
-											)}
-										</Button>
-									</div>
-								</SwiperSlide>
-							)}
-						</Swiper>
-					</div>
-					<div className="fr gap-2 pl-4">
-						<Button ref={prev} className="swiper-button-prev px-6 py-1 rounded-full bg-foreground-300 text-black">
-							<IoArrowBack size={30} />
-						</Button>
-						<Button ref={next} className="swiper-button-next px-6 py-1 rounded-full bg-foreground-300 text-black">
-							<IoArrowForward size={30} />
-						</Button>
-					</div>
-				</section>
-			)}
-		</>
-	);
+	if (removeFromCW ? cwCollection && cwCollection?.length > 0 : stateCollection.collection) {
+		return (
+			<section className="fc w-full items-start gap-3 overflow-hidden">
+				{headline && <h2 className="px-5 text-2xl font-bold text-white sm:text-4xl">{headline}</h2>}
+				<div className="max-w-full overflow-x-hidden">
+					<Swiper
+						modules={[Scrollbar, Navigation]}
+						// freeMode={true}
+						navigation={{
+							nextEl: next.current,
+							prevEl: prev.current,
+							hideOnClick: true,
+						}}
+						scrollbar={{ draggable: true, hide: false, enabled: true }}
+						spaceBetween={10}
+						slidesPerView={'auto'}
+						onInit={() => setIsLoading && setIsLoading(false)}
+						// onTouchStart={() => setIsDragging(true)}
+						// onTouchEnd={() => setIsDragging(false)}
+					>
+						{removeFromCW
+							? cwCollection?.toReversed().map((content) => (
+									<SwiperSlide key={`${content.id} ${content.popularity}`}>
+										<NewCard removeFromCW={removeFromCW} content={content} />
+									</SwiperSlide>
+								))
+							: stateCollection.collection.map((content) => (
+									<SwiperSlide key={`${content.id} ${content.popularity}`}>
+										<NewCard removeFromCW={removeFromCW} content={content} />
+									</SwiperSlide>
+								))}
+						{more === false ? null : (
+							<SwiperSlide>
+								<div className="fr aspect-[2/3] min-w-[200px] cursor-pointer gap-3 rounded-lg pr-5 text-white">
+									<Button
+										// use load more function to take the prev statecollection and in the collection key of that object append the output from loadMore
+										onClick={async () => {
+											setloadMoreisLoading(true);
+											const updatedCollection = await loadMore(stateCollection);
+											setStateCollection(updatedCollection);
+											setloadMoreisLoading(false);
+										}}
+										variant="ghost"
+										className="py-2 text-white transition-colors hover:text-black"
+									>
+										{loadMoreIsLoading ? (
+											<>
+												<LuLoader className="animate-spinner-linear-spin" /> <span>Loading...</span>
+											</>
+										) : (
+											<>
+												Load More <IoIosArrowRoundForward size={30} />
+											</>
+										)}
+									</Button>
+								</div>
+							</SwiperSlide>
+						)}
+					</Swiper>
+				</div>
+				<div className="fr gap-2 pl-4 mt-2">
+					<Button ref={prev} className="swiper-button-prev px-6 py-1 rounded-full bg-foreground-300 text-black">
+						<IoArrowBack size={30} />
+					</Button>
+					<Button ref={next} className="swiper-button-next px-6 py-1 rounded-full bg-foreground-300 text-black">
+						<IoArrowForward size={30} />
+					</Button>
+				</div>
+			</section>
+		);
+	}
 };
 
 export default Slider;

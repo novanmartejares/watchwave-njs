@@ -1,10 +1,8 @@
 "use client";
 import { cubicBezier, motion } from "framer-motion";
 import React from "react";
-
+import LoadingAnimation from "./components/Loading";
 const Loading = () => {
-  // ball easing
-  const easing = cubicBezier(1, 0.5, 0, 1);
   return (
     <motion.div
       initial={{ opacity: 1 }}
@@ -14,15 +12,7 @@ const Loading = () => {
       className="fc fixed z-50 h-screen w-screen bg-black"
     >
       {/* bouncing ball animation */}
-
-      <div className="lds-ellipsis">
-        <div></div>
-        <div></div>
-        <div></div>
-        <div></div>
-      </div>
-
-      <div className="text-white">Loading...</div>
+      <LoadingAnimation />
     </motion.div>
   );
 };
