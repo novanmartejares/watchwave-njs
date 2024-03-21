@@ -49,7 +49,7 @@
 
 ![Image](https://watchwave-v2.vercel.app/ss.jpg)
 
- A free and open-sourced movie and TV streaming platform. that brings high-quality content right to your fingertips. WatchWave utilizes embeds from other websites to ensure the best viewing experience possible. With account features to track your watched shows and movies, and a watchlist feature to store content for future viewing, you can stay organized and never miss out on your favorite content. WatchWave is built with a beautiful UI that enhances the user experience, creating an immersive and enjoyable way to stream. What started as a project for school has now expanded to be used worldwide, offering entertainment for all.
+ A free and open-sourced movie and TV streaming platform that brings high-quality content right to your fingertips. WatchWave utilizes embeds from other websites to ensure the best viewing experience possible. With account features to track your watched shows and movies, and a watchlist feature to store content for future viewing, you can stay organized and never miss out on your favorite content. WatchWave is built with a beautiful UI that enhances the user experience, creating an immersive and enjoyable way to stream. What started as a project for school has now expanded to be used worldwide, offering entertainment for all.
 <p align="right">(<a href="#readme-top">back to top</a>)</p>
 
 
